@@ -6,6 +6,7 @@
 import { store } from './store.js';
 import { calculateDuePenalty, formatINR, formatDate, getOverviewMetrics, generateWhatsAppReminderUrl } from './penalty.js';
 import { renderHome, cleanupHomeEffects } from './home.js';
+import { CONFIG } from './config.js';
 
 let activeView = 'home';
 let memberSearch = '';
@@ -32,8 +33,14 @@ export function init() {
   const container = document.getElementById('view-root');
   const navButtons = document.querySelectorAll('.nav-btn');
 
-  // Initialize theme from localStorage
-  const savedTheme = localStorage.getItem('af_theme') || 'theme-dark';
+  // Apply configurable brand text from env if present
+  const brandNameEl = document.querySelector('.brand-name');
+  const brandBranchEl = document.querySelector('.brand-branch');
+  if (brandNameEl) brandNameEl.textContent = CONFIG.gymName;
+  if (brandBranchEl) brandBranchEl.textContent = CONFIG.gymBranch;
+
+  // Initialize theme from localStorage (falling back to VITE_DEFAULT_THEME)
+  const savedTheme = localStorage.getItem('af_theme') || CONFIG.defaultTheme;
   const foundIdx = THEMES.findIndex(t => t.id === savedTheme);
   if (foundIdx !== -1) currentThemeIndex = foundIdx;
 

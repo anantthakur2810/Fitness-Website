@@ -8,7 +8,9 @@
  * - payment (payment_id, due_id, paid_date, fee_paid, penalty_paid, payment_mode, notes)
  */
 
-const STORAGE_KEY = 'GYM_DB_STORAGE_V4';
+import { CONFIG } from './config.js';
+
+const STORAGE_KEY = CONFIG.storageKey;
 
 export const INITIAL_DATA = {
   membership_plan: [
@@ -185,9 +187,9 @@ export const INITIAL_DATA = {
   penalty_rule: [
     {
       rule_id: 1,
-      grace_days: 5,
-      penalty_per_day: 10.00,
-      max_penalty: 500.00
+      grace_days: CONFIG.defaultGraceDays,
+      penalty_per_day: CONFIG.defaultPenaltyPerDay,
+      max_penalty: CONFIG.defaultMaxPenalty
     }
   ],
 

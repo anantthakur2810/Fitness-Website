@@ -7,6 +7,7 @@
  */
 
 import { store } from './store.js';
+import { CONFIG } from './config.js';
 
 /**
  * Safely parse 'YYYY-MM-DD' into local midnight Date object,
@@ -196,7 +197,7 @@ export function calculateDuePenalty(due) {
 export function formatINR(val) {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'INR',
+    currency: CONFIG.currencyCode || 'INR',
     maximumFractionDigits: 2
   }).format(val || 0);
 }
