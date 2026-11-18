@@ -819,16 +819,38 @@ function renderPayments(container) {
 // ==========================================
 function renderSettings(container) {
   const rule = store.getPenaltyRule();
+  const cloud = store.getCloudStatus();
+  const isConnected = cloud.status === 'connected';
 
   container.innerHTML = `
     <div class="view-header">
       <div>
         <h1 class="view-title">Settings & Configuration</h1>
-        <p class="view-subtitle">Anytime Fitness Sohna — Penalty policy, data backup, and database management</p>
+        <p class="view-subtitle">Anytime Fitness Sohna — Penalty policy, cloud sync, and database management</p>
       </div>
     </div>
 
     <div style="max-width: 650px; display: flex; flex-direction: column; gap: 1.5rem;">
+      <!-- Cloud Database Sync Status -->
+      <div class="table-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span style="font-weight: 700;">Database Storage Engine</span>
+            <span class="badge ${isConnected ? 'badge-active' : 'badge-pending'}">
+              ${isConnected ? `MongoDB Atlas · ${cloud.database || 'gym_db'}` : 'Local Browser Storage'}
+            </span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">
+            ${isConnected
+              ? `Live cloud sync enabled via /api/gym.${cloud.lastSyncedAt ? ` Last synced: ${new Date(cloud.lastSyncedAt).toLocaleTimeString()}` : ''}`
+              : 'Running in offline/local fallback mode. Connect MongoDB Atlas in Vercel Storage to enable live multi-device cloud sync.'}
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" id="btn-cloud-sync">
+          🔄 Sync Now
+        </button>
+      </div>
+
       <div class="table-card">
         <div class="table-toolbar">
           <span class="table-toolbar-title">Penalty Rule Configuration</span>
@@ -884,6 +906,16 @@ function renderSettings(container) {
       </div>
     </div>
   `;
+
+  const syncBtn = container.querySelector('#btn-cloud-sync');
+  if (syncBtn) {
+    syncBtn.addEventListener('click', async () => {
+      syncBtn.disabled = true;
+      syncBtn.textContent = 'Syncing...';
+      const ok = await store.syncFromCloud();
+      showToast(ok ? 'Synced with MongoDB Atlas.' : 'MongoDB API not connected — using Local Storage.', ok ? 'success' : 'info');
+    });
+  }
 
   const form = container.querySelector('#form-penalty-settings');
   if (form) {

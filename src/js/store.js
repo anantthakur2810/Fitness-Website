@@ -1,282 +1,21 @@
 /**
  * Anytime Fitness Sohna — Gym Database Store
- * Relational schema implementation from capstone_dbms.sql:
- * - membership_plan (plan_id, plan_name, duration_months, monthly_fee)
- * - member (member_id, full_name, phone, email, join_date, plan_id, status)
- * - penalty_rule (rule_id, grace_days, penalty_per_day, max_penalty)
- * - fee_due (due_id, member_id, due_date, fee_amount, status)
- * - payment (payment_id, due_id, paid_date, fee_paid, penalty_paid, payment_mode, notes)
+ * Dual-mode persistence:
+ * 1. Live MongoDB Atlas sync via Vercel Serverless API (/api/gym) when deployed on Vercel
+ * 2. Instant browser localStorage cache & automatic offline/local fallback
  */
 
 import { CONFIG } from './config.js';
+import { createInitialData } from './seed.js';
 
 const STORAGE_KEY = CONFIG.storageKey;
+const API_ENDPOINT = '/api/gym';
 
-export const INITIAL_DATA = {
-  membership_plan: [
-    {
-      plan_id: 1,
-      plan_name: 'Monthly Standard',
-      duration_months: 1,
-      monthly_fee: 1500.00
-    },
-    {
-      plan_id: 2,
-      plan_name: 'Quarterly Fitness',
-      duration_months: 3,
-      monthly_fee: 1200.00
-    },
-    {
-      plan_id: 3,
-      plan_name: 'Half-Yearly Pro',
-      duration_months: 6,
-      monthly_fee: 1000.00
-    },
-    {
-      plan_id: 4,
-      plan_name: 'Annual Elite',
-      duration_months: 12,
-      monthly_fee: 850.00
-    },
-    {
-      plan_id: 5,
-      plan_name: 'Student Special (Quarterly)',
-      duration_months: 3,
-      monthly_fee: 900.00
-    }
-  ],
-
-  member: [
-    {
-      member_id: 101,
-      full_name: 'Aarav Sharma',
-      phone: '+91 98201 12345',
-      email: 'aarav.sharma@example.com',
-      join_date: '2026-01-10',
-      plan_id: 4,
-      status: 'Active'
-    },
-    {
-      member_id: 102,
-      full_name: 'Pooja Iyer',
-      phone: '+91 98333 45678',
-      email: 'pooja.iyer@example.com',
-      join_date: '2026-03-15',
-      plan_id: 2,
-      status: 'Active'
-    },
-    {
-      member_id: 103,
-      full_name: 'Rohan Gupta',
-      phone: '+91 97123 98765',
-      email: 'rohan.gupta@example.com',
-      join_date: '2026-05-01',
-      plan_id: 3,
-      status: 'Active'
-    },
-    {
-      member_id: 104,
-      full_name: 'Kavita Patil',
-      phone: '+91 96543 21098',
-      email: 'kavita.patil@example.com',
-      join_date: '2026-08-20',
-      plan_id: 1,
-      status: 'Active'
-    },
-    {
-      member_id: 105,
-      full_name: 'Arjun Nair',
-      phone: '+91 93210 98765',
-      email: 'arjun.nair@example.com',
-      join_date: '2026-02-01',
-      plan_id: 1,
-      status: 'Inactive'
-    },
-    {
-      member_id: 106,
-      full_name: 'Sneha Kulkarni',
-      phone: '+91 98111 22334',
-      email: 'sneha.k@example.com',
-      join_date: '2026-01-20',
-      plan_id: 4,
-      status: 'Active'
-    },
-    {
-      member_id: 107,
-      full_name: 'Vikram Singhania',
-      phone: '+91 98765 43210',
-      email: 'vikram.s@example.com',
-      join_date: '2026-04-10',
-      plan_id: 3,
-      status: 'Active'
-    },
-    {
-      member_id: 108,
-      full_name: 'Ananya Deshmukh',
-      phone: '+91 99200 11223',
-      email: 'ananya.d@example.com',
-      join_date: '2026-08-01',
-      plan_id: 5,
-      status: 'Active'
-    },
-    {
-      member_id: 109,
-      full_name: 'Aditya Verma',
-      phone: '+91 98450 67890',
-      email: 'aditya.v@example.com',
-      join_date: '2026-07-15',
-      plan_id: 2,
-      status: 'Active'
-    },
-    {
-      member_id: 110,
-      full_name: 'Meera Joshi',
-      phone: '+91 97654 32109',
-      email: 'meera.joshi@example.com',
-      join_date: '2026-09-01',
-      plan_id: 1,
-      status: 'Active'
-    },
-    {
-      member_id: 111,
-      full_name: 'Kunal Malhotra',
-      phone: '+91 98321 65498',
-      email: 'kunal.m@example.com',
-      join_date: '2026-02-15',
-      plan_id: 4,
-      status: 'Active'
-    },
-    {
-      member_id: 112,
-      full_name: 'Priya Sen',
-      phone: '+91 99887 76655',
-      email: 'priya.sen@example.com',
-      join_date: '2026-08-15',
-      plan_id: 5,
-      status: 'Active'
-    },
-    {
-      member_id: 113,
-      full_name: 'Rajesh Choudhary',
-      phone: '+91 91234 56780',
-      email: 'rajesh.c@example.com',
-      join_date: '2026-03-01',
-      plan_id: 1,
-      status: 'Inactive'
-    },
-    {
-      member_id: 114,
-      full_name: 'Neha Bansal',
-      phone: '+91 98222 33445',
-      email: 'neha.bansal@example.com',
-      join_date: '2026-06-10',
-      plan_id: 2,
-      status: 'Active'
-    },
-    {
-      member_id: 115,
-      full_name: 'Siddharth Roy',
-      phone: '+91 97531 86420',
-      email: 'sid.roy@example.com',
-      join_date: '2026-05-20',
-      plan_id: 3,
-      status: 'Active'
-    }
-  ],
-
-  penalty_rule: [
-    {
-      rule_id: 1,
-      grace_days: CONFIG.defaultGraceDays,
-      penalty_per_day: CONFIG.defaultPenaltyPerDay,
-      max_penalty: CONFIG.defaultMaxPenalty
-    }
-  ],
-
-  fee_due: [
-    { due_id: 1, member_id: 101, due_date: '2026-10-01', fee_amount: 10200.00, status: 'Paid' },
-    { due_id: 2, member_id: 102, due_date: '2026-10-05', fee_amount: 3600.00, status: 'Paid' },
-    { due_id: 3, member_id: 106, due_date: '2026-10-10', fee_amount: 10200.00, status: 'Paid' },
-    { due_id: 4, member_id: 107, due_date: '2026-10-12', fee_amount: 6000.00, status: 'Paid' },
-    { due_id: 5, member_id: 111, due_date: '2026-10-15', fee_amount: 10200.00, status: 'Paid' },
-    { due_id: 6, member_id: 103, due_date: '2026-09-15', fee_amount: 6000.00, status: 'Paid' },
-    { due_id: 7, member_id: 105, due_date: '2026-09-01', fee_amount: 1500.00, status: 'Paid' },
-    { due_id: 8, member_id: 104, due_date: '2026-10-10', fee_amount: 1500.00, status: 'Pending' },
-    { due_id: 9, member_id: 109, due_date: '2026-10-20', fee_amount: 3600.00, status: 'Pending' },
-    { due_id: 10, member_id: 113, due_date: '2026-09-01', fee_amount: 1500.00, status: 'Pending' },
-    { due_id: 11, member_id: 110, due_date: '2026-11-02', fee_amount: 1500.00, status: 'Pending' },
-    { due_id: 12, member_id: 108, due_date: '2026-11-04', fee_amount: 2700.00, status: 'Pending' },
-    { due_id: 13, member_id: 112, due_date: '2026-11-10', fee_amount: 2700.00, status: 'Pending' },
-    { due_id: 14, member_id: 114, due_date: '2026-11-20', fee_amount: 3600.00, status: 'Pending' },
-    { due_id: 15, member_id: 115, due_date: '2026-12-01', fee_amount: 6000.00, status: 'Pending' }
-  ],
-
-  payment: [
-    {
-      payment_id: 501,
-      due_id: 1,
-      paid_date: '2026-10-01',
-      fee_paid: 10200.00,
-      penalty_paid: 0.00,
-      payment_mode: 'Card',
-      notes: 'Annual Elite plan payment - HDFC Credit Card'
-    },
-    {
-      payment_id: 502,
-      due_id: 2,
-      paid_date: '2026-10-05',
-      fee_paid: 3600.00,
-      penalty_paid: 0.00,
-      payment_mode: 'UPI',
-      notes: 'Google Pay ref #982348712'
-    },
-    {
-      payment_id: 503,
-      due_id: 3,
-      paid_date: '2026-10-10',
-      fee_paid: 10200.00,
-      penalty_paid: 0.00,
-      payment_mode: 'UPI',
-      notes: 'PhonePe ref #339182390'
-    },
-    {
-      payment_id: 504,
-      due_id: 4,
-      paid_date: '2026-10-12',
-      fee_paid: 6000.00,
-      penalty_paid: 0.00,
-      payment_mode: 'Cash',
-      notes: 'Counter Cash Settlement'
-    },
-    {
-      payment_id: 505,
-      due_id: 5,
-      paid_date: '2026-10-15',
-      fee_paid: 10200.00,
-      penalty_paid: 0.00,
-      payment_mode: 'Card',
-      notes: 'ICICI Debit Card'
-    },
-    {
-      payment_id: 506,
-      due_id: 6,
-      paid_date: '2026-10-05',
-      fee_paid: 6000.00,
-      penalty_paid: 150.00,
-      payment_mode: 'UPI',
-      notes: 'Late settlement with ₹150 penalty - Paytm'
-    },
-    {
-      payment_id: 507,
-      due_id: 7,
-      paid_date: '2026-09-20',
-      fee_paid: 1500.00,
-      penalty_paid: 100.00,
-      payment_mode: 'Cash',
-      notes: 'Final settlement before deactivation'
-    }
-  ]
-};
+export const INITIAL_DATA = createInitialData({
+  graceDays: CONFIG.defaultGraceDays,
+  penaltyPerDay: CONFIG.defaultPenaltyPerDay,
+  maxPenalty: CONFIG.defaultMaxPenalty
+});
 
 export function normalizePhone(phone) {
   if (!phone) return '';
@@ -288,7 +27,17 @@ class GymStore {
     this.data = this.load();
     this.listeners = [];
     this.sqlLogs = [];
+    this.cloudStatus = 'local'; // 'checking' | 'connected' | 'local' | 'error'
+    this.cloudDbName = null;
+    this.lastSyncedAt = null;
+    this._syncQueue = Promise.resolve();
+
     this.initDefaultSqlLogs();
+
+    // Hydrate from Vercel MongoDB API automatically in browser environments
+    if (typeof window !== 'undefined' && typeof fetch !== 'undefined') {
+      this.syncFromCloud();
+    }
   }
 
   initDefaultSqlLogs() {
@@ -311,6 +60,82 @@ class GymStore {
     return this.sqlLogs;
   }
 
+  getCloudStatus() {
+    return {
+      status: this.cloudStatus,
+      database: this.cloudDbName,
+      lastSyncedAt: this.lastSyncedAt
+    };
+  }
+
+  async syncFromCloud() {
+    if (typeof fetch === 'undefined') return false;
+    this.cloudStatus = 'checking';
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store'
+      });
+
+      if (!res.ok) {
+        this.cloudStatus = 'local';
+        this.notify();
+        return false;
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        this.cloudStatus = 'local';
+        this.notify();
+        return false;
+      }
+
+      const json = await res.json();
+      if (json && json.connected && json.data && json.data.membership_plan) {
+        this.data = json.data;
+        this.cloudStatus = 'connected';
+        this.cloudDbName = json.database || 'gym_db';
+        this.lastSyncedAt = new Date().toISOString();
+        this.saveLocalOnly();
+        this.notify();
+        return true;
+      }
+
+      this.cloudStatus = 'local';
+      this.notify();
+      return false;
+    } catch {
+      this.cloudStatus = 'local';
+      this.notify();
+      return false;
+    }
+  }
+
+  syncToCloud() {
+    if (this.cloudStatus !== 'connected' || typeof fetch === 'undefined') return;
+    const snapshot = JSON.stringify(this.data);
+
+    this._syncQueue = this._syncQueue
+      .then(async () => {
+        const res = await fetch(API_ENDPOINT, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: snapshot
+        });
+        if (res.ok) {
+          const json = await res.json();
+          this.lastSyncedAt = json.syncedAt || new Date().toISOString();
+        } else {
+          console.warn('Cloud sync warning:', res.status);
+        }
+      })
+      .catch((err) => {
+        console.warn('Cloud sync failed (local cache preserved):', err);
+      });
+  }
+
   load() {
     try {
       if (typeof localStorage !== 'undefined') {
@@ -328,7 +153,7 @@ class GymStore {
     return JSON.parse(JSON.stringify(INITIAL_DATA));
   }
 
-  save() {
+  saveLocalOnly() {
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
@@ -336,7 +161,16 @@ class GymStore {
     } catch (e) {
       console.error('Storage write error', e);
     }
+  }
+
+  notify() {
     this.listeners.forEach(fn => fn(this.data));
+  }
+
+  save() {
+    this.saveLocalOnly();
+    this.notify();
+    this.syncToCloud();
   }
 
   reset() {
@@ -573,9 +407,9 @@ class GymStore {
   getPenaltyRule() {
     return this.data.penalty_rule[0] || {
       rule_id: 1,
-      grace_days: 5,
-      penalty_per_day: 10.00,
-      max_penalty: 500.00
+      grace_days: CONFIG.defaultGraceDays,
+      penalty_per_day: CONFIG.defaultPenaltyPerDay,
+      max_penalty: CONFIG.defaultMaxPenalty
     };
   }
 
