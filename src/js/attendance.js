@@ -157,11 +157,86 @@ function getAttendanceMetrics() {
 }
 
 /**
+ * Render the Animated Custom Dropdown Component
+ */
+function renderAnimDropdown({ id, options, value, fallbackIcon }) {
+  const current = options.find(o => o.value === value) || options[0];
+  return `
+    <div class="anim-dropdown" id="dropdown-${id}">
+      <button 
+        type="button" 
+        class="anim-dropdown-trigger" 
+        id="btn-${id}" 
+        aria-haspopup="listbox" 
+        aria-expanded="false"
+        onclick="window.toggleAnimDropdown('${id}', event)"
+      >
+        <span class="anim-dropdown-icon">${current.icon || fallbackIcon}</span>
+        <span class="anim-dropdown-label">${current.label}</span>
+        <span class="anim-dropdown-arrow">
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </button>
+      <div class="anim-dropdown-menu" id="menu-${id}" role="listbox">
+        <div class="anim-dropdown-menu-list">
+          ${options.map(opt => {
+            const isSelected = opt.value === value;
+            return `
+              <div 
+                class="anim-dropdown-option ${isSelected ? 'selected' : ''}" 
+                role="option" 
+                aria-selected="${isSelected}"
+                onclick="window.selectAnimDropdownOption('${id}', '${opt.value}', event)"
+              >
+                <div class="anim-option-main">
+                  <span class="anim-option-icon">${opt.icon || ''}</span>
+                  <span class="anim-option-label">${opt.label}</span>
+                </div>
+                ${isSelected ? `
+                  <span class="anim-option-check">
+                    <svg viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
  * Render the Main Attendance View
  */
 export function renderAttendanceView(container) {
   const metrics = getAttendanceMetrics();
   const records = getFilteredAttendance();
+
+  const dateOptions = [
+    { value: 'today', label: 'Today', icon: '📅' },
+    { value: 'yesterday', label: 'Yesterday', icon: '📅' },
+    { value: 'week', label: 'Past 7 Days', icon: '🗓️' },
+    { value: 'all', label: `All Time (${metrics.totalRecords})`, icon: '🗂️' }
+  ];
+
+  const methodOptions = [
+    { value: 'ALL', label: 'All Methods', icon: '⚡' },
+    { value: 'QR Code', label: 'QR Code Pass', icon: '📱' },
+    { value: 'RFID Card', label: 'RFID Smart Card', icon: '💳' },
+    { value: 'Manual', label: 'Manual Entry', icon: '✍️' }
+  ];
+
+  const statusOptions = [
+    { value: 'ALL', label: 'All Statuses', icon: '🌐' },
+    { value: 'Allowed', label: 'Allowed (Normal)', icon: '✅' },
+    { value: 'Overdue Warning', label: 'Overdue Warning', icon: '⚠️' },
+    { value: 'Blocked', label: 'Blocked / Inactive', icon: '⛔' }
+  ];
 
   container.innerHTML = `
     <div class="view-header">
@@ -231,43 +306,27 @@ export function renderAttendanceView(container) {
     <!-- Controls Bar -->
     <div class="table-controls">
       <div class="search-wrap">
+        <span class="search-icon">🔍</span>
         <input 
           type="text" 
-          class="search-input" 
+          class="search-input has-icon" 
           id="att-search" 
           placeholder="Search by member name, ID, phone, turnstile..." 
           value="${attendanceSearch}"
         />
+        ${attendanceSearch ? `
+          <button type="button" class="search-clear-btn" onclick="clearAttendanceSearch()" title="Clear search">✕</button>
+        ` : ''}
       </div>
 
-      <div class="filters-wrap" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <!-- Date Filter -->
-        <select class="filter-select" id="att-date-filter">
-          <option value="today" ${attendanceDateFilter === 'today' ? 'selected' : ''}>📅 Today</option>
-          <option value="yesterday" ${attendanceDateFilter === 'yesterday' ? 'selected' : ''}>📅 Yesterday</option>
-          <option value="week" ${attendanceDateFilter === 'week' ? 'selected' : ''}>📅 Past 7 Days</option>
-          <option value="all" ${attendanceDateFilter === 'all' ? 'selected' : ''}>📅 All Time (${metrics.totalRecords})</option>
-        </select>
-
-        <!-- Method Filter -->
-        <select class="filter-select" id="att-method-filter">
-          <option value="ALL" ${attendanceMethodFilter === 'ALL' ? 'selected' : ''}>All Methods</option>
-          <option value="QR Code" ${attendanceMethodFilter === 'QR Code' ? 'selected' : ''}>📱 QR Code</option>
-          <option value="RFID Card" ${attendanceMethodFilter === 'RFID Card' ? 'selected' : ''}>💳 RFID Card</option>
-          <option value="Manual" ${attendanceMethodFilter === 'Manual' ? 'selected' : ''}>✍️ Manual</option>
-        </select>
-
-        <!-- Status Filter -->
-        <select class="filter-select" id="att-status-filter">
-          <option value="ALL" ${attendanceStatusFilter === 'ALL' ? 'selected' : ''}>All Statuses</option>
-          <option value="Allowed" ${attendanceStatusFilter === 'Allowed' ? 'selected' : ''}>Allowed (Normal)</option>
-          <option value="Overdue Warning" ${attendanceStatusFilter === 'Overdue Warning' ? 'selected' : ''}>⚠️ Overdue Warning</option>
-          <option value="Blocked" ${attendanceStatusFilter === 'Blocked' ? 'selected' : ''}>⛔ Blocked / Inactive</option>
-        </select>
+      <div class="filters-wrap">
+        ${renderAnimDropdown({ id: 'att-date', options: dateOptions, value: attendanceDateFilter, fallbackIcon: '📅' })}
+        ${renderAnimDropdown({ id: 'att-method', options: methodOptions, value: attendanceMethodFilter, fallbackIcon: '⚡' })}
+        ${renderAnimDropdown({ id: 'att-status', options: statusOptions, value: attendanceStatusFilter, fallbackIcon: '🌐' })}
 
         ${(attendanceSearch || attendanceDateFilter !== 'today' || attendanceMethodFilter !== 'ALL' || attendanceStatusFilter !== 'ALL') ? `
-          <button type="button" class="btn btn-sm btn-secondary" id="att-reset-filters" title="Reset all filters">
-            Reset Filters
+          <button type="button" class="btn btn-sm btn-secondary filter-reset-btn" id="att-reset-filters" title="Reset all filters">
+            ↺ Reset Filters
           </button>
         ` : ''}
       </div>
@@ -414,30 +473,6 @@ export function renderAttendanceView(container) {
         reFocus.focus();
         reFocus.setSelectionRange(reFocus.value.length, reFocus.value.length);
       }
-    });
-  }
-
-  const dateSelect = document.getElementById('att-date-filter');
-  if (dateSelect) {
-    dateSelect.addEventListener('change', (e) => {
-      attendanceDateFilter = e.target.value;
-      renderAttendanceView(container);
-    });
-  }
-
-  const methodSelect = document.getElementById('att-method-filter');
-  if (methodSelect) {
-    methodSelect.addEventListener('change', (e) => {
-      attendanceMethodFilter = e.target.value;
-      renderAttendanceView(container);
-    });
-  }
-
-  const statusSelect = document.getElementById('att-status-filter');
-  if (statusSelect) {
-    statusSelect.addEventListener('change', (e) => {
-      attendanceStatusFilter = e.target.value;
-      renderAttendanceView(container);
     });
   }
 
@@ -759,6 +794,97 @@ export function openGateCheckInModal(preselectedMemberId = null) {
 
 if (typeof window !== 'undefined') {
   window.openGateCheckInModal = openGateCheckInModal;
+
+  /**
+   * Toggle custom animated dropdown menu open/closed
+   */
+  window.toggleAnimDropdown = function (id, event) {
+    if (event) event.stopPropagation();
+    const dropdown = document.getElementById(`dropdown-${id}`);
+    const btn = document.getElementById(`btn-${id}`);
+    if (!dropdown || !btn) return;
+
+    const isOpen = dropdown.classList.contains('is-open');
+
+    // Close any other open dropdowns first
+    document.querySelectorAll('.anim-dropdown.is-open').forEach(el => {
+      if (el !== dropdown) {
+        el.classList.remove('is-open');
+        const b = el.querySelector('.anim-dropdown-trigger');
+        if (b) b.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    if (isOpen) {
+      dropdown.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    } else {
+      dropdown.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  };
+
+  /**
+   * Select an option from custom animated dropdown
+   */
+  window.selectAnimDropdownOption = function (id, val, event) {
+    if (event) event.stopPropagation();
+
+    // Close dropdown
+    const dropdown = document.getElementById(`dropdown-${id}`);
+    const btn = document.getElementById(`btn-${id}`);
+    if (dropdown) dropdown.classList.remove('is-open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+
+    // Update filter value
+    if (id === 'att-date') {
+      attendanceDateFilter = val;
+    } else if (id === 'att-method') {
+      attendanceMethodFilter = val;
+    } else if (id === 'att-status') {
+      attendanceStatusFilter = val;
+    }
+
+    const container = document.getElementById('view-root');
+    if (container) {
+      renderAttendanceView(container);
+    }
+  };
+
+  /**
+   * Clear search text
+   */
+  window.clearAttendanceSearch = function () {
+    attendanceSearch = '';
+    const container = document.getElementById('view-root');
+    if (container) {
+      renderAttendanceView(container);
+    }
+  };
+
+  // Close dropdowns on outside click (registered once)
+  if (!window.__afAnimDropdownListenerAttached) {
+    window.__afAnimDropdownListenerAttached = true;
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.anim-dropdown')) {
+        document.querySelectorAll('.anim-dropdown.is-open').forEach(el => {
+          el.classList.remove('is-open');
+          const b = el.querySelector('.anim-dropdown-trigger');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.anim-dropdown.is-open').forEach(el => {
+          el.classList.remove('is-open');
+          const b = el.querySelector('.anim-dropdown-trigger');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+  }
 
   /**
    * Confirm and delete single attendance record
