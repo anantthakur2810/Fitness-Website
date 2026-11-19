@@ -156,7 +156,7 @@ export function openAuthModal(initialTab = 'member') {
           <h2 class="auth-title">Anytime Fitness Access Control</h2>
           <p class="auth-subtitle">Choose your portal to sign in with your credentials</p>
         </div>
-        <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
+        <button type="button" class="auth-close-btn" onclick="closeModal()" title="Close Modal">✕</button>
       </div>
 
       <div class="auth-tab-bar">
@@ -207,7 +207,7 @@ export function openAuthModal(initialTab = 'member') {
             />
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-weight: 700;">
+          <button type="submit" class="btn btn-block auth-submit-btn">
             Sign In to Member Portal →
           </button>
         </form>
@@ -258,7 +258,7 @@ export function openAuthModal(initialTab = 'member') {
             />
           </div>
 
-          <button type="submit" class="btn btn-accent btn-block" style="padding: 0.75rem; font-weight: 700;">
+          <button type="submit" class="btn btn-block auth-submit-btn">
             🛡️ Access Admin Console →
           </button>
         </form>
