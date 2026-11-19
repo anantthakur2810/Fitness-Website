@@ -254,18 +254,6 @@ export function renderAttendanceView(container) {
       </div>
     </div>
 
-    <!-- Live Gate Status Alert -->
-    <div class="gate-status-bar">
-      <div class="gate-status-left">
-        <span class="gate-indicator-dot"></span>
-        <span class="gate-indicator-title">TURNSTILES OPERATIONAL</span>
-        <span class="gate-indicator-meta">Turnstile A (Main Entry) & Turnstile B (East Wing) Active</span>
-      </div>
-      <div class="gate-status-right">
-        <span class="gate-fast-stat">⚡ 24/7 Smart Access Active</span>
-      </div>
-    </div>
-
     <!-- Metrics Row -->
     <div class="metrics-row">
       <div class="metric-card">
@@ -280,18 +268,6 @@ export function renderAttendanceView(container) {
           ${metrics.activeInGym}
         </div>
         <div class="metric-sub">Active workout session (past 2.5 hrs)</div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-label">Access Method Split</div>
-        <div class="metric-val tabular-nums" style="font-size: 1.15rem; display: flex; gap: 0.6rem; align-items: baseline;">
-          <span>📱 ${metrics.qrCount}</span>
-          <span style="color: var(--text-muted); font-size: 0.9rem;">/</span>
-          <span>💳 ${metrics.cardCount}</span>
-          <span style="color: var(--text-muted); font-size: 0.9rem;">/</span>
-          <span style="font-size: 0.9rem; color: var(--text-muted);">✍️ ${metrics.manualCount}</span>
-        </div>
-        <div class="metric-sub">QR Code / RFID Keyfob / Front Desk</div>
       </div>
 
       <div class="metric-card">
