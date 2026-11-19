@@ -17,7 +17,8 @@ const COLLECTIONS = [
   'member',
   'penalty_rule',
   'fee_due',
-  'payment'
+  'payment',
+  'attendance'
 ];
 
 function getClientPromise() {

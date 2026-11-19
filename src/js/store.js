@@ -143,6 +143,9 @@ class GymStore {
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed.membership_plan && parsed.member && parsed.fee_due && parsed.payment) {
+            if (!Array.isArray(parsed.attendance)) {
+              parsed.attendance = INITIAL_DATA.attendance || [];
+            }
             return parsed;
           }
         }
@@ -396,6 +399,7 @@ class GymStore {
 
     this.data.payment = this.data.payment.filter(p => !dueIds.includes(p.due_id));
     this.data.fee_due = this.data.fee_due.filter(d => d.member_id !== memberId);
+    this.data.attendance = (this.data.attendance || []).filter(a => a.member_id !== memberId);
     this.data.member = this.data.member.filter(mem => mem.member_id !== memberId);
 
     this.logSql(`DELETE FROM member WHERE member_id = ${memberId};`);
@@ -588,6 +592,88 @@ class GymStore {
     return true;
   }
 
+  // --- ATTENDANCE ---
+  getAttendance() {
+    return this.data.attendance || [];
+  }
+
+  getAttendanceForMember(memberId) {
+    const memId = Number(memberId);
+    return (this.data.attendance || []).filter(a => a.member_id === memId);
+  }
+
+  recordCheckIn({ member_id, method = 'QR Code', notes = '', check_in_date, check_in_time }) {
+    const memId = Number(member_id);
+    const member = this.getMember(memId);
+    if (!member) throw new Error('Member not found for check-in.');
+
+    if (!Array.isArray(this.data.attendance)) {
+      this.data.attendance = [];
+    }
+
+    const todayStr = check_in_date || new Date().toISOString().split('T')[0];
+    const nowTimeStr = check_in_time || new Date().toTimeString().split(' ')[0];
+
+    // Determine access status
+    let status = 'Allowed';
+    let warningMessage = '';
+
+    if (member.status === 'Inactive') {
+      status = 'Blocked';
+      warningMessage = `Member #${member.member_id} (${member.full_name}) is marked Inactive. Turnstile Locked.`;
+    } else {
+      // Check if there are overdue pending dues past grace period
+      const rule = this.getPenaltyRule();
+      const graceDays = rule.grace_days ?? 5;
+      const todayDate = new Date(todayStr);
+
+      const overdueDues = (this.data.fee_due || []).filter(d => {
+        if (d.member_id !== memId || d.status !== 'Pending') return false;
+        const dueDate = new Date(d.due_date);
+        const diffMs = todayDate - dueDate;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        return diffDays > graceDays;
+      });
+
+      if (overdueDues.length > 0) {
+        status = 'Overdue Warning';
+        const totalPending = overdueDues.reduce((s, d) => s + Number(d.fee_amount), 0);
+        warningMessage = `Member has overdue payment (₹${totalPending.toLocaleString('en-IN')}) exceeding ${graceDays} days grace.`;
+      }
+    }
+
+    const nextId = Math.max(1000, ...(this.data.attendance || []).map(a => Number(a.attendance_id) || 0)) + 1;
+    const newRecord = {
+      attendance_id: nextId,
+      member_id: memId,
+      check_in_date: todayStr,
+      check_in_time: nowTimeStr,
+      method: method || 'QR Code',
+      status,
+      notes: notes || (status === 'Overdue Warning' ? 'Turnstile warning flagged' : status === 'Blocked' ? 'Turnstile Locked - Inactive' : 'Turnstile Gate A Access')
+    };
+
+    this.data.attendance.unshift(newRecord);
+    this.logSql(`INSERT INTO attendance (attendance_id, member_id, check_in_date, check_in_time, method, status, notes) VALUES (${nextId}, ${memId}, '${todayStr}', '${nowTimeStr}', '${newRecord.method}', '${status}', '${newRecord.notes.replace(/'/g, "''")}');`);
+    this.save();
+
+    return {
+      record: newRecord,
+      member,
+      status,
+      warningMessage
+    };
+  }
+
+  deleteAttendance(attendanceId) {
+    const id = Number(attendanceId);
+    if (!this.data.attendance) return false;
+    this.data.attendance = this.data.attendance.filter(a => a.attendance_id !== id);
+    this.logSql(`DELETE FROM attendance WHERE attendance_id = ${id};`);
+    this.save();
+    return true;
+  }
+
   // --- BACKUP & EXPORT ---
   exportJsonBackup() {
     return JSON.stringify(this.data, null, 2);
@@ -597,6 +683,9 @@ class GymStore {
     try {
       const parsed = JSON.parse(jsonString);
       if (parsed.membership_plan && parsed.member && parsed.fee_due && parsed.payment) {
+        if (!Array.isArray(parsed.attendance)) {
+          parsed.attendance = INITIAL_DATA.attendance || [];
+        }
         this.data = parsed;
         this.logSql('-- IMPORTED JSON BACKUP DATABASE');
         this.save();

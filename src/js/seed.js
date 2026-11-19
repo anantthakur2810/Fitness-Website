@@ -71,6 +71,40 @@ export function createInitialData(defaults = {}) {
       { payment_id: 505, due_id: 5, paid_date: '2026-10-15', fee_paid: 10200.00, penalty_paid: 0.00, payment_mode: 'Card', notes: 'ICICI Debit Card' },
       { payment_id: 506, due_id: 6, paid_date: '2026-10-05', fee_paid: 6000.00, penalty_paid: 150.00, payment_mode: 'UPI', notes: 'Late settlement with ₹150 penalty - Paytm' },
       { payment_id: 507, due_id: 7, paid_date: '2026-09-20', fee_paid: 1500.00, penalty_paid: 100.00, payment_mode: 'Cash', notes: 'Final settlement before deactivation' }
-    ]
+    ],
+
+    attendance: (() => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
+
+      return [
+        // Today's Check-ins
+        { attendance_id: 1001, member_id: 101, check_in_date: today, check_in_time: '06:12:40', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A (East Wing)' },
+        { attendance_id: 1002, member_id: 102, check_in_date: today, check_in_time: '06:34:15', method: 'QR Code', status: 'Allowed', notes: 'Mobile App Pass Scan' },
+        { attendance_id: 1003, member_id: 106, check_in_date: today, check_in_time: '07:05:22', method: 'RFID Card', status: 'Allowed', notes: 'Smart Band Tap' },
+        { attendance_id: 1004, member_id: 107, check_in_date: today, check_in_time: '07:22:50', method: 'QR Code', status: 'Allowed', notes: 'Turnstile B' },
+        { attendance_id: 1005, member_id: 104, check_in_date: today, check_in_time: '08:15:10', method: 'QR Code', status: 'Overdue Warning', notes: 'Pending fee ₹1,500 overdue alert' },
+        { attendance_id: 1006, member_id: 111, check_in_date: today, check_in_time: '08:45:00', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1007, member_id: 103, check_in_date: today, check_in_time: '09:10:35', method: 'QR Code', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1008, member_id: 109, check_in_date: today, check_in_time: '11:05:18', method: 'RFID Card', status: 'Overdue Warning', notes: 'Pending fee ₹3,600 alert' },
+        { attendance_id: 1009, member_id: 114, check_in_date: today, check_in_time: '12:30:45', method: 'Manual', status: 'Allowed', notes: 'Front Desk Manual Log' },
+
+        // Yesterday's Check-ins
+        { attendance_id: 1010, member_id: 101, check_in_date: yesterday, check_in_time: '06:15:00', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1011, member_id: 102, check_in_date: yesterday, check_in_time: '06:40:12', method: 'QR Code', status: 'Allowed', notes: 'Turnstile B' },
+        { attendance_id: 1012, member_id: 108, check_in_date: yesterday, check_in_time: '07:18:40', method: 'QR Code', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1013, member_id: 112, check_in_date: yesterday, check_in_time: '08:02:55', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile B' },
+        { attendance_id: 1014, member_id: 105, check_in_date: yesterday, check_in_time: '10:14:20', method: 'RFID Card', status: 'Blocked', notes: 'Turnstile Locked - Inactive Member' },
+        { attendance_id: 1015, member_id: 115, check_in_date: yesterday, check_in_time: '18:45:30', method: 'QR Code', status: 'Allowed', notes: 'Evening Peak Session' },
+
+        // Two Days Ago
+        { attendance_id: 1016, member_id: 106, check_in_date: twoDaysAgo, check_in_time: '07:00:10', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1017, member_id: 107, check_in_date: twoDaysAgo, check_in_time: '07:30:45', method: 'QR Code', status: 'Allowed', notes: 'Turnstile B' },
+        { attendance_id: 1018, member_id: 110, check_in_date: twoDaysAgo, check_in_time: '08:12:00', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1019, member_id: 111, check_in_date: twoDaysAgo, check_in_time: '17:50:20', method: 'RFID Card', status: 'Allowed', notes: 'Turnstile A' },
+        { attendance_id: 1020, member_id: 114, check_in_date: twoDaysAgo, check_in_time: '19:15:10', method: 'QR Code', status: 'Allowed', notes: 'Turnstile B' }
+      ];
+    })()
   };
 }

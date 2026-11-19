@@ -1,9 +1,9 @@
 -- ============================================================================
 -- ANYTIME FITNESS SOHNA — COMPLETE RELATIONAL DATABASE SCRIPT
 -- File: capstone_dbms.sql
+-- Detailed modular scripts available in ./database/
 -- Single-file installer for MySQL Workbench / phpMyAdmin / MySQL CLI
 -- DBMS Capstone Project (Semester 3)
--- Detailed modular scripts available in ./database/
 -- ============================================================================
 
 CREATE DATABASE IF NOT EXISTS gym_db;
@@ -12,6 +12,7 @@ USE gym_db;
 -- ============================================================================
 -- 1. DDL: TABLE CREATION
 -- ============================================================================
+DROP TABLE IF EXISTS attendance;
 DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS fee_due;
 DROP TABLE IF EXISTS penalty_rule;
@@ -69,6 +70,19 @@ CREATE TABLE payment (
         ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE attendance (
+    attendance_id   INT PRIMARY KEY AUTO_INCREMENT,
+    member_id       INT NOT NULL,
+    check_in_date   DATE NOT NULL,
+    check_in_time   TIME NOT NULL,
+    method          ENUM('QR Code','RFID Card','Manual') NOT NULL DEFAULT 'QR Code',
+    status          ENUM('Allowed','Overdue Warning','Blocked') NOT NULL DEFAULT 'Allowed',
+    notes           VARCHAR(255) DEFAULT NULL,
+    CONSTRAINT fk_attendance_member 
+        FOREIGN KEY (member_id) REFERENCES member(member_id) 
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================================================
 -- 2. INDEXES
 -- ============================================================================
@@ -80,6 +94,10 @@ CREATE INDEX idx_fee_due_date ON fee_due(due_date);
 CREATE INDEX idx_payment_due ON payment(due_id);
 CREATE INDEX idx_payment_date ON payment(paid_date);
 CREATE INDEX idx_payment_mode ON payment(payment_mode);
+CREATE INDEX idx_attendance_member ON attendance(member_id);
+CREATE INDEX idx_attendance_date ON attendance(check_in_date);
+CREATE INDEX idx_attendance_method ON attendance(method);
+CREATE INDEX idx_attendance_status ON attendance(status);
 
 -- ============================================================================
 -- 3. SEED DATA (SAMPLE RECORDS)
@@ -137,9 +155,47 @@ INSERT INTO payment (payment_id, due_id, paid_date, fee_paid, penalty_paid, paym
 (506, 6, '2026-10-05', 6000.00, 150.00, 'UPI', 'Late settlement with ₹150 penalty - Paytm'),
 (507, 7, '2026-09-20', 1500.00, 100.00, 'Cash', 'Final settlement before deactivation');
 
+INSERT INTO attendance (attendance_id, member_id, check_in_date, check_in_time, method, status, notes) VALUES
+(1001, 101, '2026-11-19', '06:12:40', 'RFID Card', 'Allowed', 'Turnstile A (East Wing)'),
+(1002, 102, '2026-11-19', '06:34:15', 'QR Code', 'Allowed', 'Mobile App Pass Scan'),
+(1003, 106, '2026-11-19', '07:05:22', 'RFID Card', 'Allowed', 'Smart Band Tap'),
+(1004, 107, '2026-11-19', '07:22:50', 'QR Code', 'Allowed', 'Turnstile B'),
+(1005, 104, '2026-11-19', '08:15:10', 'QR Code', 'Overdue Warning', 'Pending fee ₹1,500 overdue alert'),
+(1006, 111, '2026-11-19', '08:45:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1007, 103, '2026-11-19', '09:10:35', 'QR Code', 'Allowed', 'Turnstile A'),
+(1008, 109, '2026-11-19', '11:05:18', 'RFID Card', 'Overdue Warning', 'Pending fee ₹3,600 alert'),
+(1009, 114, '2026-11-19', '12:30:45', 'Manual', 'Allowed', 'Front Desk Manual Log'),
+(1010, 101, '2026-11-18', '06:15:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1011, 102, '2026-11-18', '06:40:12', 'QR Code', 'Allowed', 'Turnstile B'),
+(1012, 108, '2026-11-18', '07:18:40', 'QR Code', 'Allowed', 'Turnstile A'),
+(1013, 112, '2026-11-18', '08:02:55', 'RFID Card', 'Allowed', 'Turnstile B'),
+(1014, 105, '2026-11-18', '10:14:20', 'RFID Card', 'Blocked', 'Turnstile Locked - Inactive Member'),
+(1015, 115, '2026-11-18', '18:45:30', 'QR Code', 'Allowed', 'Evening Peak Session'),
+(1016, 106, '2026-11-17', '07:00:10', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1017, 107, '2026-11-17', '07:30:45', 'QR Code', 'Allowed', 'Turnstile B'),
+(1018, 110, '2026-11-17', '08:12:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1019, 111, '2026-11-17', '17:50:20', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1020, 114, '2026-11-17', '19:15:10', 'QR Code', 'Allowed', 'Turnstile B');
+
 -- ============================================================================
 -- 4. VIEWS
 -- ============================================================================
+CREATE OR REPLACE VIEW v_attendance_daily_log AS
+SELECT 
+    a.attendance_id,
+    a.check_in_date,
+    a.check_in_time,
+    a.method,
+    a.status AS access_status,
+    a.notes,
+    m.member_id,
+    m.full_name,
+    m.phone,
+    m.status AS member_status,
+    p.plan_name
+FROM attendance a
+JOIN member m ON a.member_id = m.member_id
+JOIN membership_plan p ON m.plan_id = p.plan_id;
 CREATE OR REPLACE VIEW v_member_dues_ledger AS
 SELECT 
     m.member_id,
@@ -246,3 +302,4 @@ BEGIN
 END //
 
 DELIMITER ;
+

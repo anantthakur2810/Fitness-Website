@@ -9,6 +9,7 @@ CREATE DATABASE IF NOT EXISTS gym_db;
 USE gym_db;
 
 -- Drop dependent tables in reverse order for safe execution
+DROP TABLE IF EXISTS attendance;
 DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS fee_due;
 DROP TABLE IF EXISTS penalty_rule;
@@ -87,6 +88,23 @@ CREATE TABLE payment (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------------------------------------------------------
+-- Table 6: attendance
+-- Records member turnstile check-ins via RFID cards, QR passes, or manual gate entries
+-- ----------------------------------------------------------------------------
+CREATE TABLE attendance (
+    attendance_id   INT PRIMARY KEY AUTO_INCREMENT,
+    member_id       INT NOT NULL,
+    check_in_date   DATE NOT NULL,
+    check_in_time   TIME NOT NULL,
+    method          ENUM('QR Code','RFID Card','Manual') NOT NULL DEFAULT 'QR Code',
+    status          ENUM('Allowed','Overdue Warning','Blocked') NOT NULL DEFAULT 'Allowed',
+    notes           VARCHAR(255) DEFAULT NULL,
+    CONSTRAINT fk_attendance_member 
+        FOREIGN KEY (member_id) REFERENCES member(member_id) 
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------------------------------------------------------
 -- Performance Indexes (Optimizing JOINs and Lookups)
 -- ----------------------------------------------------------------------------
 CREATE INDEX idx_member_phone ON member(phone);
@@ -97,4 +115,8 @@ CREATE INDEX idx_fee_due_date ON fee_due(due_date);
 CREATE INDEX idx_payment_due ON payment(due_id);
 CREATE INDEX idx_payment_date ON payment(paid_date);
 CREATE INDEX idx_payment_mode ON payment(payment_mode);
+CREATE INDEX idx_attendance_member ON attendance(member_id);
+CREATE INDEX idx_attendance_date ON attendance(check_in_date);
+CREATE INDEX idx_attendance_method ON attendance(method);
+CREATE INDEX idx_attendance_status ON attendance(status);
 

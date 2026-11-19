@@ -83,3 +83,29 @@ INSERT INTO payment (payment_id, due_id, paid_date, fee_paid, penalty_paid, paym
 (506, 6, '2026-10-05', 6000.00, 150.00, 'UPI', 'Late settlement with ₹150 penalty - Paytm'),
 (507, 7, '2026-09-20', 1500.00, 100.00, 'Cash', 'Final settlement before deactivation');
 
+-- ----------------------------------------------------------------------------
+-- 6. attendance
+-- Sample check-in events across RFID cards, QR codes, and turnstile gates
+-- ----------------------------------------------------------------------------
+INSERT INTO attendance (attendance_id, member_id, check_in_date, check_in_time, method, status, notes) VALUES
+(1001, 101, '2026-11-19', '06:12:40', 'RFID Card', 'Allowed', 'Turnstile A (East Wing)'),
+(1002, 102, '2026-11-19', '06:34:15', 'QR Code', 'Allowed', 'Mobile App Pass Scan'),
+(1003, 106, '2026-11-19', '07:05:22', 'RFID Card', 'Allowed', 'Smart Band Tap'),
+(1004, 107, '2026-11-19', '07:22:50', 'QR Code', 'Allowed', 'Turnstile B'),
+(1005, 104, '2026-11-19', '08:15:10', 'QR Code', 'Overdue Warning', 'Pending fee ₹1,500 overdue alert'),
+(1006, 111, '2026-11-19', '08:45:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1007, 103, '2026-11-19', '09:10:35', 'QR Code', 'Allowed', 'Turnstile A'),
+(1008, 109, '2026-11-19', '11:05:18', 'RFID Card', 'Overdue Warning', 'Pending fee ₹3,600 alert'),
+(1009, 114, '2026-11-19', '12:30:45', 'Manual', 'Allowed', 'Front Desk Manual Log'),
+(1010, 101, '2026-11-18', '06:15:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1011, 102, '2026-11-18', '06:40:12', 'QR Code', 'Allowed', 'Turnstile B'),
+(1012, 108, '2026-11-18', '07:18:40', 'QR Code', 'Allowed', 'Turnstile A'),
+(1013, 112, '2026-11-18', '08:02:55', 'RFID Card', 'Allowed', 'Turnstile B'),
+(1014, 105, '2026-11-18', '10:14:20', 'RFID Card', 'Blocked', 'Turnstile Locked - Inactive Member'),
+(1015, 115, '2026-11-18', '18:45:30', 'QR Code', 'Allowed', 'Evening Peak Session'),
+(1016, 106, '2026-11-17', '07:00:10', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1017, 107, '2026-11-17', '07:30:45', 'QR Code', 'Allowed', 'Turnstile B'),
+(1018, 110, '2026-11-17', '08:12:00', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1019, 111, '2026-11-17', '17:50:20', 'RFID Card', 'Allowed', 'Turnstile A'),
+(1020, 114, '2026-11-17', '19:15:10', 'QR Code', 'Allowed', 'Turnstile B');
+

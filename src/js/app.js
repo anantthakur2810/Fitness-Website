@@ -6,6 +6,8 @@
 import { store } from './store.js';
 import { calculateDuePenalty, formatINR, formatDate, getOverviewMetrics, generateWhatsAppReminderUrl } from './penalty.js';
 import { renderHome, cleanupHomeEffects } from './home.js';
+import { renderAttendanceView, openGateCheckInModal } from './attendance.js';
+import { renderDigitalMemberPass } from './qr.js';
 import { CONFIG } from './config.js';
 
 let activeView = 'home';
@@ -87,6 +89,9 @@ export function init() {
       case 'plans':
         renderPlans(container);
         break;
+      case 'attendance':
+        renderAttendanceView(container);
+        break;
       case 'dues':
         renderFeeDues(container);
         break;
@@ -133,6 +138,7 @@ function renderDashboard(container) {
         <p class="view-subtitle">Anytime Fitness Sohna — Membership status, revenue metrics, and outstanding fee dues</p>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary" onclick="openGateCheckInModal()">⚡ Gate Check-In</button>
         <button type="button" class="btn btn-secondary" onclick="openAddMemberModal()">+ Add Member</button>
         <button type="button" class="btn btn-primary" onclick="openAddDueModal()">+ Create Fee Due</button>
       </div>
@@ -325,6 +331,66 @@ function renderDashboard(container) {
         </table>
       </div>
     </div>
+
+    <!-- Live Gate Activity & Recent Check-Ins -->
+    <div class="table-card" style="margin-top: 1.5rem;">
+      <div class="table-toolbar">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="gate-live-pulse"></span>
+          <span class="table-toolbar-title">Live Gate Turnstile & Recent Entries</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="openGateCheckInModal()">⚡ + Check-In</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="window.navigate('attendance')">All Attendance Logs →</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Date</th>
+              <th>Member Name</th>
+              <th>Method</th>
+              <th>Gate Status</th>
+              <th>Turnstile Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${store.getAttendance().slice(0, 5).map(att => {
+              const mem = store.getMember(att.member_id);
+              const isQr = att.method === 'QR Code';
+              const isCard = att.method === 'RFID Card';
+              return `
+                <tr>
+                  <td class="tabular-nums font-bold">${att.check_in_time}</td>
+                  <td class="tabular-nums">${formatDate(att.check_in_date)}</td>
+                  <td>
+                    ${mem ? `
+                      <a href="#" class="member-link" onclick="openMemberProfileModal(${mem.member_id}); return false;">
+                        ${mem.full_name}
+                      </a>
+                    ` : `Member #${att.member_id}`}
+                  </td>
+                  <td>
+                    <span class="attendance-method-badge ${isQr ? 'method-qr' : isCard ? 'method-rfid' : 'method-manual'}">
+                      <span>${isQr ? '📱' : isCard ? '💳' : '✍️'}</span>
+                      <span>${att.method}</span>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge ${att.status === 'Allowed' ? 'badge-active' : att.status === 'Blocked' ? 'badge-danger' : 'badge-warning'}">
+                      ${att.status}
+                    </span>
+                  </td>
+                  <td style="font-size: 0.85rem; color: var(--text-secondary);">${att.notes || 'Turnstile Gate'}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
   `;
 }
 
@@ -424,11 +490,19 @@ function renderMembers(container) {
                     <div style="display: inline-flex; gap: 0.35rem;">
                       <button 
                         type="button" 
+                        class="btn btn-sm btn-primary" 
+                        onclick="openGateCheckInModal(${m.member_id})"
+                        title="Gate Turnstile Check-In"
+                      >
+                        ⚡ Check In
+                      </button>
+                      <button 
+                        type="button" 
                         class="btn btn-sm btn-secondary" 
                         onclick="openMemberProfileModal(${m.member_id})"
-                        title="View Full Profile & Billing"
+                        title="View Full Profile, Digital Pass & Billing"
                       >
-                        Profile
+                        Pass
                       </button>
                       <button 
                         type="button" 
@@ -943,6 +1017,7 @@ window.openMemberProfileModal = function (memberId) {
   const details = store.getMemberDetails(memberId);
   if (!details) return;
   const { member, plan, payments, totalPaid, pendingDues, totalPendingFee } = details;
+  const memberAttendance = store.getAttendanceForMember(member.member_id);
   const dialog = document.getElementById('modal-generic');
 
   dialog.innerHTML = `
@@ -954,6 +1029,9 @@ window.openMemberProfileModal = function (memberId) {
       <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body-content" style="max-height: 80vh; overflow-y: auto;">
+      <!-- Digital Membership Pass (RFID & QR) -->
+      ${renderDigitalMemberPass(member, plan)}
+
       <div class="profile-card-grid">
         <div class="profile-stat-box">
           <div class="profile-stat-label">Member ID</div>
@@ -968,8 +1046,8 @@ window.openMemberProfileModal = function (memberId) {
           <div class="profile-stat-val">${plan ? plan.plan_name : 'N/A'}</div>
         </div>
         <div class="profile-stat-box">
-          <div class="profile-stat-label">Join Date</div>
-          <div class="profile-stat-val">${formatDate(member.join_date)}</div>
+          <div class="profile-stat-label">Total Gym Visits</div>
+          <div class="profile-stat-val">${memberAttendance.length} check-ins</div>
         </div>
       </div>
 
@@ -988,7 +1066,10 @@ window.openMemberProfileModal = function (memberId) {
       </div>
 
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn btn-sm btn-primary" onclick="closeModal(); openRenewMemberModal(${member.member_id});">
+        <button type="button" class="btn btn-sm btn-primary" onclick="closeModal(); openGateCheckInModal(${member.member_id});">
+          ⚡ Instant Turnstile Check-In
+        </button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal(); openRenewMemberModal(${member.member_id});">
           🔄 Renew Next Subscription Cycle
         </button>
         <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal(); openEditMemberModal(${member.member_id});">
@@ -1073,6 +1154,49 @@ window.openMemberProfileModal = function (memberId) {
                     </td>
                   </tr>
                 `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Turnstile Attendance History -->
+      <div style="margin-top: 0.5rem;">
+        <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center;">
+          <span>Turnstile Attendance History (${memberAttendance.length} visits)</span>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal(); window.navigate('attendance');">All Club Logs →</button>
+        </div>
+        <div class="table-wrap" style="border: 1px solid var(--border); border-radius: var(--radius-sm);">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Turnstile / Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${memberAttendance.length === 0 ? `
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1rem;">No gate check-in logs recorded yet.</td></tr>
+              ` : memberAttendance.slice(0, 8).map(att => `
+                <tr>
+                  <td class="tabular-nums">${formatDate(att.check_in_date)}</td>
+                  <td class="tabular-nums font-bold">${att.check_in_time}</td>
+                  <td>
+                    <span class="attendance-method-badge ${att.method === 'QR Code' ? 'method-qr' : att.method === 'RFID Card' ? 'method-rfid' : 'method-manual'}">
+                      <span>${att.method === 'QR Code' ? '📱' : att.method === 'RFID Card' ? '💳' : '✍️'}</span>
+                      <span>${att.method}</span>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge ${att.status === 'Allowed' ? 'badge-active' : att.status === 'Blocked' ? 'badge-danger' : 'badge-warning'}">
+                      ${att.status}
+                    </span>
+                  </td>
+                  <td style="font-size: 0.82rem; color: var(--text-secondary);">${att.notes || 'Turnstile Gate'}</td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
