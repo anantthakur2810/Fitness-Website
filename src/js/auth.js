@@ -258,10 +258,6 @@ export function openAuthModal(initialTab = 'member') {
           </button>
         </form>
       </div>
-
-      <div class="auth-modal-foot">
-        <span>🔒 Role-Based Access Control • 256-Bit Session Security</span>
-      </div>
     </div>
   `;
 
