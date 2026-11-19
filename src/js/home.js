@@ -187,15 +187,13 @@ export function renderHome(container) {
 
           <div class="hero-portal-bar">
             <button type="button" class="btn btn-primary" onclick="openAuthModal('member')" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; font-weight: 700;">
-              <span>👤</span>
-              <span>Member Portal Sign In →</span>
+              <span>Member Sign In →</span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="openAuthModal('admin')" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.15rem;">
-              <span>🛡️</span>
-              <span>Admin & Staff Console</span>
+              <span>Admin Console</span>
             </button>
             <button type="button" class="btn btn-secondary" onclick="scrollToHomeSection('home-facilities')" style="padding: 0.75rem 1rem;">
-              <span>Explore Facilities ↓</span>
+              <span>Facilities ↓</span>
             </button>
           </div>
         </div>
@@ -205,7 +203,7 @@ export function renderHome(container) {
             <img src="./images/hero-gym.jpg" alt="Anytime Fitness Sector 34 Sohna Gym Floor" loading="eager" />
             <div class="hero-image-caption">
               <span class="badge badge-active">The Leaf Mall · 4th &amp; 5th Floor</span>
-              <span style="font-size: 0.78rem; color: #e4e4e7;">Click to enlarge gallery</span>
+              <span style="font-size: 0.78rem; color: #e4e4e7;">Click to enlarge</span>
             </div>
           </div>
         </div>
@@ -215,8 +213,8 @@ export function renderHome(container) {
       <section class="home-section" id="home-facilities">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Club Facilities &amp; Highlights</h2>
-            <p class="section-subtitle">Designed for beginners, athletes, and everyday fitness enthusiasts in Sohna</p>
+            <h2 class="section-title">Facilities</h2>
+            <p class="section-subtitle">Amenities and training equipment in Sohna</p>
           </div>
         </div>
 
@@ -258,11 +256,11 @@ export function renderHome(container) {
       <section class="home-section" id="home-gallery">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Club Photo Gallery</h2>
-            <p class="section-subtitle">Take a look inside our Sector 34, Sohna facility — click any photo to inspect</p>
+            <h2 class="section-title">Photo Gallery</h2>
+            <p class="section-subtitle">Inside our Sector 34, Sohna club</p>
           </div>
           <a href="https://www.instagram.com/anytimefitnesssec34sohna/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary">
-            📸 More Photos on Instagram ↗
+            Instagram ↗
           </a>
         </div>
 
@@ -286,8 +284,8 @@ export function renderHome(container) {
       <section class="home-section" id="home-tour">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Gym Tour Video &amp; Training Reels</h2>
-            <p class="section-subtitle">Interactive walkthrough of Anytime Fitness Sohna zones plus live club reels</p>
+            <h2 class="section-title">Virtual Tour</h2>
+            <p class="section-subtitle">Club walkthrough and training reels</p>
           </div>
         </div>
 
@@ -297,7 +295,7 @@ export function renderHome(container) {
             <div class="video-viewport">
               <canvas id="gym-tour-canvas" width="960" height="540"></canvas>
               <div class="video-overlay-top">
-                <span class="video-live-badge">▶ HD VIRTUAL WALKTHROUGH</span>
+                <span class="video-live-badge">▶ WALKTHROUGH</span>
                 <span class="video-timer tabular-nums" id="tour-timer">00:00 / 00:24</span>
               </div>
               <div class="video-overlay-bottom">
@@ -309,7 +307,7 @@ export function renderHome(container) {
             </div>
 
             <div class="video-controls-bar">
-              <button type="button" class="btn btn-sm btn-accent" id="tour-play-btn">⏸ Pause Tour</button>
+              <button type="button" class="btn btn-sm btn-accent" id="tour-play-btn">Pause Tour</button>
               <div class="video-progress-track" id="tour-progress-track" title="Click to jump">
                 <div class="video-progress-fill" id="tour-progress-fill"></div>
               </div>
@@ -358,10 +356,10 @@ export function renderHome(container) {
       <section class="home-section" id="home-plans">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Membership Tiers</h2>
-            <p class="section-subtitle">Transparent pricing with flexible durations synced live with club records</p>
+            <h2 class="section-title">Membership Plans</h2>
+            <p class="section-subtitle">Flexible membership tiers and pricing</p>
           </div>
-          <button type="button" class="btn btn-sm btn-secondary" onclick="openAuthModal('member')">Join / Member Sign In →</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="openAuthModal('member')">Join Club →</button>
         </div>
 
         <div class="plans-list">
@@ -371,7 +369,7 @@ export function renderHome(container) {
               <div class="plan-item-price">${formatINR(p.monthly_fee)} <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">/ mo</span></div>
               <div class="plan-item-duration">${p.duration_months} Month${p.duration_months > 1 ? 's' : ''} • Total ${formatINR(p.duration_months * p.monthly_fee)}</div>
               <button type="button" class="btn btn-sm btn-primary" style="margin-top: auto;" onclick="openAuthModal('member')">
-                Join with ${p.plan_name} →
+                Select Plan →
               </button>
             </div>
           `).join('')}
@@ -382,11 +380,11 @@ export function renderHome(container) {
       <section class="home-section" id="home-location">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Find Us in Sector 34, Sohna</h2>
-            <p class="section-subtitle">Visit the club for a free facility tour and InBody fitness consultation</p>
+            <h2 class="section-title">Location &amp; Hours</h2>
+            <p class="section-subtitle">Open 24/7 at The Leaf Mall, Sector 34, Sohna</p>
           </div>
           <a href="https://maps.app.goo.gl/yWkfrEVoVgs1v3Ao6" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-accent">
-            📍 Get Directions on Google Maps ↗
+            Directions ↗
           </a>
         </div>
 
@@ -434,7 +432,7 @@ export function renderHome(container) {
 
             <div style="margin-top: auto; display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <a href="https://maps.app.goo.gl/yWkfrEVoVgs1v3Ao6" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex: 1;">
-                📍 Open Exact Pin in Maps
+                Open Google Maps
               </a>
             </div>
           </div>
@@ -445,8 +443,8 @@ export function renderHome(container) {
       <section class="home-section">
         <div class="section-head">
           <div>
-            <h2 class="section-title">Connect With Us Everywhere</h2>
-            <p class="section-subtitle">Follow our Sohna club and official Anytime Fitness India handles</p>
+            <h2 class="section-title">Social Channels</h2>
+            <p class="section-subtitle">Follow our Sohna club and official Anytime Fitness handles</p>
           </div>
         </div>
 

@@ -252,15 +252,14 @@ export function renderAttendanceView(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Gate Attendance & Turnstile Monitor</h1>
-        <p class="view-subtitle">Anytime Fitness Sohna — Live RFID smart card taps, QR mobile pass scans, and member entry logs</p>
+        <h1 class="view-title">Attendance</h1>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
         <button type="button" class="btn btn-secondary" onclick="exportAttendanceCSV()">
-          📥 Export CSV
+          Export CSV
         </button>
         <button type="button" class="btn btn-primary" onclick="openGateCheckInModal()">
-          ⚡ + Gate Check-In
+          + Gate Check-In
         </button>
       </div>
     </div>
@@ -274,19 +273,19 @@ export function renderAttendanceView(container) {
       </div>
 
       <div class="metric-card">
-        <div class="metric-label">Estimated Inside Gym</div>
+        <div class="metric-label">Currently Inside</div>
         <div class="metric-val tabular-nums" style="color: var(--accent-text);">
           ${metrics.activeInGym}
         </div>
-        <div class="metric-sub">Active workout session (past 2.5 hrs)</div>
+        <div class="metric-sub">Past 2 hours</div>
       </div>
 
       <div class="metric-card">
-        <div class="metric-label">Flagged / Overdue Alerts</div>
+        <div class="metric-label">Access Flags</div>
         <div class="metric-val tabular-nums" style="color: ${metrics.warningCount > 0 ? 'var(--warning-text)' : 'inherit'};">
           ${metrics.warningCount}
         </div>
-        <div class="metric-sub">${metrics.warningCount > 0 ? 'Late fee or inactive pass flagged' : 'Zero access anomalies today'}</div>
+        <div class="metric-sub">${metrics.warningCount > 0 ? 'Overdue dues or inactive pass' : 'Normal'}</div>
       </div>
     </div>
 
@@ -313,7 +312,7 @@ export function renderAttendanceView(container) {
 
         ${(attendanceSearch || attendanceDateFilter !== 'today' || attendanceMethodFilter !== 'ALL' || attendanceStatusFilter !== 'ALL') ? `
           <button type="button" class="btn btn-sm btn-secondary filter-reset-btn" id="att-reset-filters" title="Reset all filters">
-            ↺ Reset Filters
+            Reset Filters
           </button>
         ` : ''}
       </div>
@@ -324,12 +323,12 @@ export function renderAttendanceView(container) {
       <table class="data-table">
         <thead>
           <tr>
-            <th>Time & Date</th>
-            <th>Member Details</th>
-            <th>Plan Tier</th>
+            <th>Date & Time</th>
+            <th>Member</th>
+            <th>Plan</th>
             <th>Method</th>
-            <th>Access Status</th>
-            <th>Turnstile / Location</th>
+            <th>Status</th>
+            <th>Gate / Notes</th>
             <th style="text-align: right;">Actions</th>
           </tr>
         </thead>
@@ -338,7 +337,7 @@ export function renderAttendanceView(container) {
             <tr>
               <td colspan="7" class="empty-state">
                 <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📋</div>
-                <div>No attendance records match the selected filters.</div>
+                <div>No attendance records found.</div>
                 <button type="button" class="btn btn-sm btn-secondary" style="margin-top: 0.75rem;" onclick="openGateCheckInModal()">
                   + Check In a Member
                 </button>
@@ -567,13 +566,13 @@ export function openGateCheckInModal(preselectedMemberId = null) {
           <div class="qr-scanner-corners"></div>
           <div class="qr-scanner-content">
             <div id="qr-scan-svg-target"></div>
-            <div class="qr-scanner-hint">Simulate scanning digital member pass</div>
+            <div class="qr-scanner-hint">Scan member pass QR</div>
           </div>
         </div>
 
         <div style="margin-top: 0.75rem;">
           <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-            Instant Scan Quick-Select:
+            Quick Select:
           </div>
           <div class="qr-quick-list">
             ${members.slice(0, 6).map(m => `
@@ -597,7 +596,7 @@ export function openGateCheckInModal(preselectedMemberId = null) {
     <div class="modal-foot">
       <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button type="button" class="btn btn-primary" id="btn-submit-checkin" onclick="processTerminalCheckIn()">
-        ⚡ Tap & Open Turnstile
+        Check In Member
       </button>
     </div>
   `;

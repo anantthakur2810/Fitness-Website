@@ -104,10 +104,10 @@ export function init() {
           ${themeButtonHtml}
           <div class="auth-role-tag admin-tag" title="Signed in as Administrator">
             <span class="role-tag-dot"></span>
-            <span>🛡️ Admin Console</span>
+            <span>Admin Console</span>
           </div>
           <button type="button" class="btn btn-sm btn-primary" onclick="openAddMemberModal()">+ Member</button>
-          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Admin Console">🚪 Logout</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Admin Console">Sign Out</button>
         `;
       }
     } else if (role === 'member') {
@@ -116,8 +116,8 @@ export function init() {
 
       if (navRoot) {
         navRoot.innerHTML = `
-          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home / Gym Info</button>
-          <button type="button" class="nav-btn ${activeView === 'member-portal' ? 'active' : ''}" onclick="window.navigate('member-portal')">👤 My Member Portal</button>
+          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home</button>
+          <button type="button" class="nav-btn ${activeView === 'member-portal' ? 'active' : ''}" onclick="window.navigate('member-portal')">Member Portal</button>
         `;
       }
       if (headerActionsRoot) {
@@ -125,16 +125,16 @@ export function init() {
           ${themeButtonHtml}
           <button type="button" class="auth-role-tag member-tag" onclick="window.navigate('member-portal')" title="View Your Member Profile">
             <span class="role-tag-dot" style="background: #22c55e;"></span>
-            <span>👤 ${memFirstName} (#${member ? member.member_id : ''})</span>
+            <span>${memFirstName} (#${member ? member.member_id : ''})</span>
           </button>
-          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Member Portal">🚪 Logout</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Member Portal">Sign Out</button>
         `;
       }
     } else {
       // Guest / Visitor Header (Public Only)
       if (navRoot) {
         navRoot.innerHTML = `
-          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home / Gym Info</button>
+          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home</button>
           <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-facilities')">Facilities</button>
           <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-tour')">Virtual Tour</button>
           <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-plans')">Membership Plans</button>
@@ -145,10 +145,10 @@ export function init() {
         headerActionsRoot.innerHTML = `
           ${themeButtonHtml}
           <button type="button" class="btn btn-sm btn-secondary btn-portal-login" onclick="openAuthModal('member')" title="Member Sign In">
-            👤 Member Login
+            Member Sign In
           </button>
           <button type="button" class="btn btn-sm btn-primary btn-admin-login" onclick="openAuthModal('admin')" title="Gym Staff / Management">
-            🛡️ Admin Portal
+            Admin Portal
           </button>
         `;
       }
@@ -277,11 +277,11 @@ function renderDashboard(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Operations Overview</h1>
-        <p class="view-subtitle">Anytime Fitness Sohna — Membership status, revenue metrics, and outstanding fee dues</p>
+        <h1 class="view-title">Overview</h1>
+        <p class="view-subtitle">Club performance and daily operations</p>
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn btn-secondary" onclick="openGateCheckInModal()">⚡ Gate Check-In</button>
+        <button type="button" class="btn btn-secondary" onclick="openGateCheckInModal()">Gate Check-In</button>
         <button type="button" class="btn btn-secondary" onclick="openAddMemberModal()">+ Add Member</button>
         <button type="button" class="btn btn-primary" onclick="openAddDueModal()">+ Create Fee Due</button>
       </div>
@@ -338,10 +338,10 @@ function renderDashboard(container) {
     <div class="table-card">
       <div class="table-toolbar">
         <div>
-          <span class="table-toolbar-title">Active Outstanding Fee Dues</span>
-          <span class="badge badge-pending" style="margin-left: 0.5rem;">${outstandingDues.length} Outstanding</span>
+          <span class="table-toolbar-title">Active Fee Dues</span>
+          <span class="badge badge-pending" style="margin-left: 0.5rem;">${outstandingDues.length} Pending</span>
         </div>
-        <button type="button" class="btn btn-sm btn-secondary" onclick="window.navigate('dues')">Manage Outstanding Dues →</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="window.navigate('dues')">Manage Dues →</button>
       </div>
       <div class="table-wrap">
         <table class="data-table">
@@ -350,7 +350,7 @@ function renderDashboard(container) {
               <th>Member</th>
               <th>Due Date</th>
               <th>Base Fee</th>
-              <th>Late Penalty (Transparent Math)</th>
+              <th>Late Penalty</th>
               <th>Total Payable</th>
               <th>Overdue Status</th>
               <th style="text-align: right;">Actions</th>
@@ -358,7 +358,7 @@ function renderDashboard(container) {
           </thead>
           <tbody>
             ${outstandingDues.length === 0 ? `
-              <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">🎉 Zero outstanding dues! All gym fees are settled.</td></tr>
+              <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">No outstanding dues.</td></tr>
             ` : outstandingDues.map(d => {
               const m = store.getMember(d.member_id);
               const p = calculateDuePenalty(d);
@@ -564,10 +564,10 @@ function renderMembers(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Gym Members</h1>
-        <p class="view-subtitle">${members.length} registered members at Anytime Fitness Sohna</p>
+        <h1 class="view-title">Members</h1>
+        <p class="view-subtitle">${members.length} registered members</p>
       </div>
-      <button type="button" class="btn btn-primary" onclick="openAddMemberModal()">+ Add New Member</button>
+      <button type="button" class="btn btn-primary" onclick="openAddMemberModal()">+ Add Member</button>
     </div>
 
     <div class="table-card">
@@ -713,10 +713,10 @@ function renderPlans(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Membership Plans</h1>
-        <p class="view-subtitle">Subscription packages, duration cycles, and fee schedules</p>
+        <h1 class="view-title">Plans</h1>
+        <p class="view-subtitle">Membership tiers and pricing</p>
       </div>
-      <button type="button" class="btn btn-primary" onclick="openAddPlanModal()">+ Add New Plan</button>
+      <button type="button" class="btn btn-primary" onclick="openAddPlanModal()">+ Add Plan</button>
     </div>
 
     <div class="plans-list">
@@ -780,8 +780,8 @@ function renderFeeDues(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Outstanding Fee Dues</h1>
-        <p class="view-subtitle">Active receivable ledger with transparent late penalty calculations</p>
+        <h1 class="view-title">Fee Dues</h1>
+        <p class="view-subtitle">Pending fee installments and overdue receivables</p>
       </div>
       <button type="button" class="btn btn-primary" onclick="openAddDueModal()">+ Create Fee Due</button>
     </div>
@@ -811,7 +811,7 @@ function renderFeeDues(container) {
               <th>Member Name</th>
               <th>Due Date</th>
               <th>Base Fee</th>
-              <th>Late Penalty (Transparent Math)</th>
+              <th>Late Penalty</th>
               <th>Total Payable</th>
               <th>Status</th>
               <th style="text-align: right;">Action</th>
@@ -930,8 +930,8 @@ function renderPayments(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Payment History & Receipts</h1>
-        <p class="view-subtitle">Settled revenue receipts with printable member tax invoices</p>
+        <h1 class="view-title">Payments</h1>
+        <p class="view-subtitle">Transaction history and receipts</p>
       </div>
     </div>
 
@@ -1040,8 +1040,8 @@ function renderSettings(container) {
   container.innerHTML = `
     <div class="view-header">
       <div>
-        <h1 class="view-title">Settings & Configuration</h1>
-        <p class="view-subtitle">Anytime Fitness Sohna — Penalty policy, cloud sync, and database management</p>
+        <h1 class="view-title">Settings</h1>
+        <p class="view-subtitle">Penalty rules and system configuration</p>
       </div>
     </div>
 
@@ -1102,10 +1102,10 @@ function renderSettings(container) {
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button type="button" class="btn btn-secondary" onclick="exportJsonBackupFile()">
-            📥 Download JSON Backup
+            Download Backup
           </button>
           <button type="button" class="btn btn-secondary" onclick="openImportModal()">
-            📤 Restore from JSON
+            Restore Backup
           </button>
         </div>
       </div>
@@ -1113,7 +1113,7 @@ function renderSettings(container) {
       <div class="table-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-color: rgba(239, 68, 68, 0.3);">
         <div>
           <div style="font-weight: 600; color: var(--danger-text);">Reset Database</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted);">Restore original Anytime Fitness sample records.</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Restore initial club records.</div>
         </div>
         <button type="button" class="btn btn-secondary" style="border-color: var(--danger); color: var(--danger-text);" onclick="resetDatabasePrompt()">
           Reset Data

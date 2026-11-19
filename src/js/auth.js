@@ -163,9 +163,8 @@ export function openAuthModal(initialTab = 'member') {
     <div class="auth-modal-container">
       <div class="auth-modal-head">
         <div>
-          <div class="auth-badge">PORTAL ACCESS</div>
-          <h2 class="auth-title">Anytime Fitness Access Control</h2>
-          <p class="auth-subtitle">Choose your portal to sign in with your credentials</p>
+          <h2 class="auth-title">Sign In</h2>
+          <p class="auth-subtitle">Anytime Fitness Sohna</p>
         </div>
         <button type="button" class="auth-close-btn" onclick="closeModal()" title="Close Modal">✕</button>
       </div>
@@ -177,7 +176,7 @@ export function openAuthModal(initialTab = 'member') {
           id="auth-tab-btn-member"
           onclick="switchAuthTab('member')"
         >
-          👤 Member Portal
+          Member Portal
         </button>
         <button 
           type="button" 
@@ -185,23 +184,19 @@ export function openAuthModal(initialTab = 'member') {
           id="auth-tab-btn-admin"
           onclick="switchAuthTab('admin')"
         >
-          🛡️ Admin & Staff
+          Admin & Staff
         </button>
       </div>
 
       <!-- MEMBER LOGIN PANEL -->
       <div id="auth-panel-member" class="auth-tab-panel ${initialTab === 'member' ? 'active' : ''}">
-        <div class="auth-panel-desc">
-          Members can check membership validity, download digital RFID/QR pass, track personal attendance, and pay pending dues via Razorpay.
-        </div>
-
         <form id="form-member-login" class="auth-form">
           <div class="form-field">
             <label>Member ID, Phone Number, or Email *</label>
             <input 
               type="text" 
               id="member-login-id" 
-              placeholder="e.g. 101, 98201 12345, or your registered email" 
+              placeholder="Member ID, phone, or email" 
               required 
               autocomplete="username"
             />
@@ -219,24 +214,20 @@ export function openAuthModal(initialTab = 'member') {
           </div>
 
           <button type="submit" class="btn btn-block auth-submit-btn">
-            Sign In to Member Portal →
+            Sign In
           </button>
         </form>
       </div>
 
       <!-- ADMIN LOGIN PANEL -->
       <div id="auth-panel-admin" class="auth-tab-panel ${initialTab === 'admin' ? 'active' : ''}">
-        <div class="auth-panel-desc">
-          Restricted to gym management staff, trainers, and accountants. Manage member enrollments, gate attendance turnstiles, and fee dues.
-        </div>
-
         <form id="form-admin-login" class="auth-form">
           <div class="form-field">
             <label>Admin Username or Email *</label>
             <input 
               type="text" 
               id="admin-login-id" 
-              placeholder="Enter admin username" 
+              placeholder="Admin username or email" 
               required 
               autocomplete="username"
             />
@@ -254,7 +245,7 @@ export function openAuthModal(initialTab = 'member') {
           </div>
 
           <button type="submit" class="btn btn-block auth-submit-btn">
-            🛡️ Access Admin Console →
+            Sign In
           </button>
         </form>
       </div>

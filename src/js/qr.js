@@ -644,7 +644,7 @@ export function renderDigitalMemberPass(member, plan) {
         </div>
 
         <div class="pass-footer">
-          <span>RFID / QR 24/7 Security Turnstile Enabled</span>
+          <span>24/7 Club Access</span>
           <span>ID #${member.member_id}</span>
         </div>
       </div>

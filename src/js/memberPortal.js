@@ -19,10 +19,10 @@ export function renderMemberPortal(container) {
     container.innerHTML = `
       <div class="empty-state" style="padding: 4rem 1rem;">
         <div style="font-size: 3rem;">🔒</div>
-        <h2>Member Authentication Required</h2>
-        <p>Please sign in with your Member ID, Phone Number, or Email to view your member portal.</p>
+        <h2>Member Sign In Required</h2>
+        <p>Sign in to view your pass, dues, and attendance.</p>
         <button type="button" class="btn btn-primary" onclick="openAuthModal('member')">
-          👤 Sign In to Member Portal
+          Sign In
         </button>
       </div>
     `;
@@ -85,7 +85,7 @@ export function renderMemberPortal(container) {
 
         <div class="member-header-actions">
           <button type="button" class="btn btn-secondary" onclick="handleLogout()">
-            🚪 Sign Out
+            Sign Out
           </button>
         </div>
       </div>
@@ -131,35 +131,35 @@ export function renderMemberPortal(container) {
           class="portal-tab-btn ${activeMemberTab === 'pass' ? 'active' : ''}" 
           onclick="switchMemberTab('pass')"
         >
-          🪪 Smart Pass & QR
+          Pass
         </button>
         <button 
           type="button" 
           class="portal-tab-btn ${activeMemberTab === 'dues' ? 'active' : ''}" 
           onclick="switchMemberTab('dues')"
         >
-          💳 Pay Dues (${pendingDues.length})
+          Dues (${pendingDues.length})
         </button>
         <button 
           type="button" 
           class="portal-tab-btn ${activeMemberTab === 'receipts' ? 'active' : ''}" 
           onclick="switchMemberTab('receipts')"
         >
-          📄 Tax Invoices (${payments.length})
+          Receipts (${payments.length})
         </button>
         <button 
           type="button" 
           class="portal-tab-btn ${activeMemberTab === 'attendance' ? 'active' : ''}" 
           onclick="switchMemberTab('attendance')"
         >
-          🏃 Entry Log (${attendance.length})
+          Attendance (${attendance.length})
         </button>
         <button 
           type="button" 
           class="portal-tab-btn ${activeMemberTab === 'plan' ? 'active' : ''}" 
           onclick="switchMemberTab('plan')"
         >
-          ℹ️ Plan Details
+          Plan
         </button>
       </div>
 
@@ -208,12 +208,12 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
         return `
           <div class="empty-state" style="padding: 3rem 1rem;">
             <div style="font-size: 2.5rem;">🎉</div>
-            <h3 style="margin-top: 0.5rem;">All Membership Dues Settled!</h3>
+            <h3 style="margin-top: 0.5rem;">No Pending Dues</h3>
             <p style="color: var(--text-muted); max-width: 440px; margin: 0.5rem auto 1.5rem;">
-              You have no pending dues. Your membership is in good standing and turnstile access is fully unlocked.
+              All membership dues are settled.
             </p>
             <button type="button" class="btn btn-secondary" onclick="switchMemberTab('receipts')">
-              📄 View Past Payment Receipts
+              View Receipts
             </button>
           </div>
         `;
@@ -223,10 +223,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h3 style="margin: 0;">Pending Fee Installments</h3>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0;">
-                Pay securely via UPI, QR Code, Debit/Credit Cards, Netbanking, or Wallets powered by Razorpay.
-              </p>
+              <h3 style="margin: 0;">Pending Dues</h3>
             </div>
           </div>
 
@@ -269,7 +266,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
                       onclick="openRazorpayCheckout(${due.due_id})"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                      Pay ${formatINR(p.totalPayable)} via Razorpay
+                      Pay ${formatINR(p.totalPayable)} with Razorpay
                     </button>
                   </div>
                 </div>
@@ -284,8 +281,8 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
         return `
           <div class="empty-state" style="padding: 3rem 1rem;">
             <div style="font-size: 2.5rem;">📄</div>
-            <h3 style="margin-top: 0.5rem;">No Payment Receipts Yet</h3>
-            <p style="color: var(--text-muted);">Receipts and official tax invoices will appear here once you settle a membership due.</p>
+            <h3 style="margin-top: 0.5rem;">No Receipts Found</h3>
+            <p style="color: var(--text-muted);">Receipts will appear here once you settle a membership due.</p>
           </div>
         `;
       }
@@ -293,10 +290,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
       return `
         <div>
           <div style="margin-bottom: 1rem;">
-            <h3 style="margin: 0;">Payment Receipts & Official Tax Invoices</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0;">
-              Instant printable GST invoices generated for every settled transaction.
-            </p>
+            <h3 style="margin: 0;">Payment Receipts</h3>
           </div>
 
           <div class="table-wrap">
@@ -335,7 +329,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
                           class="btn btn-sm btn-secondary" 
                           onclick="openReceiptModal(${p.payment_id})"
                         >
-                          📄 View Tax Invoice
+                          View Receipt
                         </button>
                       </td>
                     </tr>
@@ -351,17 +345,14 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
       return `
         <div>
           <div style="margin-bottom: 1rem;">
-            <h3 style="margin: 0;">My Gym Visits & Gate Entries</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0;">
-              Turnstile access is recorded automatically whenever you enter using your credentials (RFID keyfob or QR pass).
-            </p>
+            <h3 style="margin: 0;">Attendance</h3>
           </div>
 
           ${attendance.length === 0 ? `
             <div class="empty-state" style="padding: 2.5rem 1rem;">
               <div style="font-size: 2rem;">🚪</div>
-              <h4>No attendance logs found</h4>
-              <p style="color: var(--text-muted);">Your entries will appear here automatically when you pass through Turnstile Gate A or B.</p>
+              <h4>No attendance records found</h4>
+              <p style="color: var(--text-muted);">Check-in logs will appear here after visiting the gym.</p>
             </div>
           ` : `
             <div class="table-wrap">
@@ -408,7 +399,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
       return `
         <div class="plan-details-grid">
           <div class="plan-info-card">
-            <span class="plan-badge">ENROLLED MEMBERSHIP PLAN</span>
+            <span class="plan-badge">CURRENT PLAN</span>
             <h2 style="margin: 0.5rem 0; font-size: 1.6rem; color: var(--text-main);">${plan ? plan.plan_name : 'Standard'}</h2>
             <div style="font-size: 1.35rem; font-weight: 800; color: var(--accent-text); margin-bottom: 1rem;">
               ${plan ? formatINR(plan.monthly_fee) : '—'} <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">/ month</span>
@@ -435,7 +426,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
           </div>
 
           <div class="plan-perks-card">
-            <h3 style="margin-bottom: 0.75rem;">Your Membership Inclusions</h3>
+            <h3 style="margin-bottom: 0.75rem;">Membership Inclusions</h3>
             <ul class="plan-perks-list">
               <li>✓ <strong>24/7/365 Unlimited Access</strong> to training floor and functional turf</li>
               <li>✓ <strong>Anytime Fitness Global Access</strong> at 5,000+ clubs worldwide</li>
@@ -446,7 +437,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
             </ul>
 
             <div style="margin-top: 1.5rem; padding: 0.85rem; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; color: var(--text-muted);">
-              💡 <em>To upgrade your plan duration or inquire about Personal Training packages, contact the front desk at <strong>+91 87965 67500</strong>.</em>
+              For plan upgrades or personal training inquiries, contact the front desk at <strong>+91 87965 67500</strong>.
             </div>
           </div>
         </div>
