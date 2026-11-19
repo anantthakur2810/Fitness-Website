@@ -73,11 +73,14 @@ class AuthManager {
     const id = (identifier || '').trim().toLowerCase();
     const pw = (password || '').trim();
 
-    // Standard admin credentials
-    const validUsernames = ['admin', 'admin@anytimefitness.com', 'manager', 'owner'];
-    const validPasswords = ['admin123', 'admin', 'password'];
+    if (!id || !pw) {
+      throw new Error('Please enter both admin username and password.');
+    }
 
-    if (validUsernames.includes(id) && (validPasswords.includes(pw) || pw.length >= 4)) {
+    const validUsernames = ['admin', 'admin@anytimefitness.com', 'manager'];
+    const validPasswords = ['admin123'];
+
+    if (validUsernames.includes(id) && validPasswords.includes(pw)) {
       const session = {
         role: 'admin',
         user: {
@@ -92,15 +95,20 @@ class AuthManager {
       return { success: true, session };
     }
 
-    throw new Error('Invalid Admin credentials. Use admin / admin123');
+    throw new Error('Invalid Admin username or password.');
   }
 
   loginAsMember(identifier, password) {
     const id = (identifier || '').trim().toLowerCase();
     const cleanNum = id.replace(/[^0-9]/g, '');
+    const pw = (password || '').trim();
+
+    if (!id || !pw) {
+      throw new Error('Please enter your member ID/phone/email and password.');
+    }
 
     const members = store.getMembers();
-    let found = members.find(m => {
+    const found = members.find(m => {
       if (String(m.member_id) === id) return true;
       if (m.email && m.email.toLowerCase() === id) return true;
       if (cleanNum && cleanNum.length >= 4 && m.phone.replace(/[^0-9]/g, '').includes(cleanNum)) return true;
@@ -108,10 +116,16 @@ class AuthManager {
     });
 
     if (!found) {
-      throw new Error(`No member found matching "${identifier}". Check Member ID, Email, or Phone.`);
+      throw new Error('Member not found. Please check your Member ID, Phone, or Email.');
     }
 
-    // Passwords accepted: 'member123', phone last 4 digits, or any 4+ char password for demo
+    // Require member123 or member's phone last 4 digits
+    const phoneDigits = found.phone.replace(/[^0-9]/g, '');
+    const last4 = phoneDigits.slice(-4);
+    if (pw !== 'member123' && pw !== last4) {
+      throw new Error('Incorrect password. Please try again.');
+    }
+
     const session = {
       role: 'member',
       memberId: found.member_id,
@@ -138,15 +152,12 @@ class AuthManager {
 export const auth = new AuthManager();
 
 /**
- * Open the Universal Role-Based Login Modal
+ * Open the Universal Role-Based Login Modal (Secure: No pre-filled IDs or demo buttons)
  * @param {'member' | 'admin'} initialTab 
  */
 export function openAuthModal(initialTab = 'member') {
   const dialog = document.getElementById('modal-generic');
   if (!dialog) return;
-
-  const members = store.getMembers();
-  const sampleMembers = members.slice(0, 4);
 
   dialog.innerHTML = `
     <div class="auth-modal-container">
@@ -190,9 +201,9 @@ export function openAuthModal(initialTab = 'member') {
             <input 
               type="text" 
               id="member-login-id" 
-              placeholder="e.g. 101 or 98201 12345 or aarav.sharma@example.com" 
-              value="101"
+              placeholder="e.g. 101, 98201 12345, or your registered email" 
               required 
+              autocomplete="username"
             />
           </div>
 
@@ -201,9 +212,9 @@ export function openAuthModal(initialTab = 'member') {
             <input 
               type="password" 
               id="member-login-pw" 
-              placeholder="Default: member123" 
-              value="member123"
+              placeholder="••••••••" 
               required 
+              autocomplete="current-password"
             />
           </div>
 
@@ -211,22 +222,6 @@ export function openAuthModal(initialTab = 'member') {
             Sign In to Member Portal →
           </button>
         </form>
-
-        <div class="auth-quick-fill">
-          <span class="auth-quick-label">⚡ Quick Demo Login:</span>
-          <div class="auth-quick-buttons">
-            ${sampleMembers.map(m => `
-              <button 
-                type="button" 
-                class="btn-demo-pill" 
-                onclick="quickLoginMember(${m.member_id})"
-                title="Login as ${m.full_name} (${m.status})"
-              >
-                👤 ${m.full_name.split(' ')[0]} (#${m.member_id})
-              </button>
-            `).join('')}
-          </div>
-        </div>
       </div>
 
       <!-- ADMIN LOGIN PANEL -->
@@ -241,9 +236,9 @@ export function openAuthModal(initialTab = 'member') {
             <input 
               type="text" 
               id="admin-login-id" 
-              placeholder="e.g. admin or admin@anytimefitness.com" 
-              value="admin"
+              placeholder="Enter admin username" 
               required 
+              autocomplete="username"
             />
           </div>
 
@@ -252,9 +247,9 @@ export function openAuthModal(initialTab = 'member') {
             <input 
               type="password" 
               id="admin-login-pw" 
-              placeholder="Password" 
-              value="admin123"
+              placeholder="••••••••" 
               required 
+              autocomplete="current-password"
             />
           </div>
 
@@ -262,22 +257,6 @@ export function openAuthModal(initialTab = 'member') {
             🛡️ Access Admin Console →
           </button>
         </form>
-
-        <div class="auth-quick-fill" style="background: rgba(14, 165, 233, 0.08); border-color: rgba(14, 165, 233, 0.2);">
-          <span class="auth-quick-label">⚡ Demo Credentials:</span>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-            Username: <strong style="color: var(--text-main);">admin</strong> &nbsp;|&nbsp; 
-            Password: <strong style="color: var(--text-main);">admin123</strong>
-          </div>
-          <button 
-            type="button" 
-            class="btn btn-sm btn-secondary" 
-            style="margin-top: 0.5rem; width: 100%;"
-            onclick="quickLoginAdmin()"
-          >
-            ⚡ Auto-Fill & Sign In as Admin
-          </button>
-        </div>
       </div>
 
       <div class="auth-modal-foot">
@@ -340,40 +319,9 @@ export function switchAuthTab(tab) {
 }
 
 /**
- * 1-click Quick Member Login for demo testing
- */
-export function quickLoginMember(memberId) {
-  try {
-    const res = auth.loginAsMember(String(memberId), 'member123');
-    const dialog = document.getElementById('modal-generic');
-    if (dialog) dialog.close();
-    window.showToast?.(`Logged in as ${res.member.full_name} (#${memberId})`, 'success');
-    window.navigate('member-portal');
-  } catch (err) {
-    window.showToast?.(err.message, 'error');
-  }
-}
-
-/**
- * 1-click Quick Admin Login for demo testing
- */
-export function quickLoginAdmin() {
-  try {
-    auth.loginAsAdmin('admin', 'admin123');
-    const dialog = document.getElementById('modal-generic');
-    if (dialog) dialog.close();
-    window.showToast?.('Logged in as Administrator.', 'success');
-    window.navigate('dashboard');
-  } catch (err) {
-    window.showToast?.(err.message, 'error');
-  }
-}
-
-/**
  * Logout handler
  */
 export function handleLogout() {
-  const currentRole = auth.getRole();
   auth.logout();
   window.showToast?.('Signed out successfully.', 'info');
   window.navigate('home');
@@ -382,7 +330,5 @@ export function handleLogout() {
 if (typeof window !== 'undefined') {
   window.openAuthModal = openAuthModal;
   window.switchAuthTab = switchAuthTab;
-  window.quickLoginMember = quickLoginMember;
-  window.quickLoginAdmin = quickLoginAdmin;
   window.handleLogout = handleLogout;
 }
