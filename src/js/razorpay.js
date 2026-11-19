@@ -75,11 +75,6 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
             <span class="rzp-amount-curr">₹</span>
             <span class="rzp-amount-val">${totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          <div class="rzp-sandbox-tag">
-            <span class="rzp-sandbox-dot"></span>
-            <span>TEST MODE</span>
-            <span class="rzp-key-code">${rzpKey}</span>
-          </div>
         </div>
       </div>
 

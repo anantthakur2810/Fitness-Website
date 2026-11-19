@@ -183,7 +183,7 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
   switch (activeMemberTab) {
     case 'pass':
       return `
-        <div class="member-pass-grid">
+        <div class="member-pass-container">
           <!-- Digital Keyfob Pass Card -->
           <div class="member-card-visual">
             <div class="card-chip"></div>
@@ -206,55 +206,6 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
                 <span class="card-rfid-dot"></span>
                 <span>RFID 24/7 ACTIVE</span>
               </div>
-            </div>
-          </div>
-
-          <!-- Smart Access Instructions -->
-          <div class="member-pass-details">
-            <h3 style="margin-bottom: 0.5rem; font-size: 1.15rem;">24/7 Smart Keyfob & QR Access</h3>
-            <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 1.25rem;">
-              Hold this digital pass or your physical RFID keyfob against Turnstile Gate A (Main Entrance) or Turnstile Gate B (East Wing) to unlock the magnetic turnstile.
-            </p>
-
-            <div class="pass-perk-list">
-              <div class="pass-perk-item">
-                <span class="pass-perk-icon">⚡</span>
-                <div>
-                  <strong>Instant Gate Authentication</strong>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">Verified against active membership and pending fee records.</div>
-                </div>
-              </div>
-              <div class="pass-perk-item">
-                <span class="pass-perk-icon">🌍</span>
-                <div>
-                  <strong>Global Anytime Fitness Access</strong>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">Valid at over 5,000+ Anytime Fitness locations worldwide after 30 days.</div>
-                </div>
-              </div>
-              <div class="pass-perk-item">
-                <span class="pass-perk-icon">📱</span>
-                <div>
-                  <strong>Touchless Mobile Verification</strong>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">Can be scanned directly from your mobile screen at turnstile barcode readers.</div>
-                </div>
-              </div>
-            </div>
-
-            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <button 
-                type="button" 
-                class="btn btn-primary" 
-                onclick="simulateMemberSelfCheckIn(${member.member_id})"
-              >
-                ⚡ Simulate Turnstile Tap (Check-In)
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-secondary" 
-                onclick="window.print()"
-              >
-                🖨️ Print Digital Pass
-              </button>
             </div>
           </div>
         </div>
