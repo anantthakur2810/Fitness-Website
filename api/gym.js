@@ -45,10 +45,6 @@ function stripMongoId(doc) {
 }
 
 async function seedIfEmpty(db) {
-  const planCount = await db.collection('membership_plan').countDocuments();
-  const memberCount = await db.collection('member').countDocuments();
-  if (planCount > 0 || memberCount > 0) return;
-
   const seed = createInitialData({
     graceDays: process.env.VITE_DEFAULT_GRACE_DAYS ?? 5,
     penaltyPerDay: process.env.VITE_DEFAULT_PENALTY_PER_DAY ?? 10,
@@ -56,9 +52,13 @@ async function seedIfEmpty(db) {
   });
 
   for (const name of COLLECTIONS) {
-    const docs = seed[name];
-    if (Array.isArray(docs) && docs.length > 0) {
-      await db.collection(name).insertMany(docs.map((d) => ({ ...d })));
+    const col = db.collection(name);
+    const count = await col.countDocuments();
+    if (count === 0) {
+      const docs = seed[name];
+      if (Array.isArray(docs) && docs.length > 0) {
+        await col.insertMany(docs.map((d) => ({ ...d })));
+      }
     }
   }
 }

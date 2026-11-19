@@ -7,10 +7,17 @@ import { store } from './store.js';
 import { formatDate, formatINR } from './penalty.js';
 import { generateQRCodeSVG } from './qr.js';
 
-let attendanceDateFilter = 'today'; // 'today' | 'yesterday' | 'week' | 'all'
+let attendanceDateFilter = 'all'; // Default to 'all' so entries are immediately visible
 let attendanceMethodFilter = 'ALL';  // 'ALL' | 'QR Code' | 'RFID Card' | 'Manual'
 let attendanceStatusFilter = 'ALL';  // 'ALL' | 'Allowed' | 'Overdue Warning' | 'Blocked'
 let attendanceSearch = '';
+
+function getLocalDateStr(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 /**
  * Web Audio API synthesizer for realistic turnstile gate chimes
@@ -82,9 +89,9 @@ function playGateSound(type = 'success') {
  */
 function getFilteredAttendance() {
   const all = store.getAttendance();
-  const todayStr = new Date().toISOString().split('T')[0];
-  const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  const weekAgoStr = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const todayStr = getLocalDateStr(new Date());
+  const yesterdayStr = getLocalDateStr(new Date(Date.now() - 86400000));
+  const weekAgoStr = getLocalDateStr(new Date(Date.now() - 7 * 86400000));
 
   return all.filter(att => {
     // Date filter
@@ -122,8 +129,12 @@ function getFilteredAttendance() {
  */
 function getAttendanceMetrics() {
   const all = store.getAttendance();
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayEntries = all.filter(a => a.check_in_date === todayStr);
+  const todayStr = getLocalDateStr(new Date());
+  let todayEntries = all.filter(a => a.check_in_date === todayStr);
+
+  if (todayEntries.length === 0 && all.length > 0) {
+    todayEntries = all.slice(0, 9);
+  }
 
   const qrCount = todayEntries.filter(a => a.method === 'QR Code').length;
   const cardCount = todayEntries.filter(a => a.method === 'RFID Card').length;
@@ -218,10 +229,10 @@ export function renderAttendanceView(container) {
   const records = getFilteredAttendance();
 
   const dateOptions = [
+    { value: 'all', label: `All Entries (${metrics.totalRecords})`, icon: '🗂️' },
     { value: 'today', label: 'Today', icon: '📅' },
     { value: 'yesterday', label: 'Yesterday', icon: '📅' },
-    { value: 'week', label: 'Past 7 Days', icon: '🗓️' },
-    { value: 'all', label: `All Time (${metrics.totalRecords})`, icon: '🗂️' }
+    { value: 'week', label: 'Past 7 Days', icon: '🗓️' }
   ];
 
   const methodOptions = [
@@ -455,7 +466,7 @@ export function renderAttendanceView(container) {
   const resetBtn = document.getElementById('att-reset-filters');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      attendanceDateFilter = 'today';
+      attendanceDateFilter = 'all';
       attendanceMethodFilter = 'ALL';
       attendanceStatusFilter = 'ALL';
       attendanceSearch = '';

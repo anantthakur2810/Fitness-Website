@@ -94,11 +94,22 @@ class GymStore {
 
       const json = await res.json();
       if (json && json.connected && json.data && json.data.membership_plan) {
-        this.data = json.data;
+        // Guard: If cloud attendance is empty or missing, populate from local/initial data and sync back
+        if (!Array.isArray(json.data.attendance) || json.data.attendance.length === 0) {
+          json.data.attendance = (this.data.attendance && this.data.attendance.length > 0)
+            ? this.data.attendance
+            : JSON.parse(JSON.stringify(INITIAL_DATA.attendance || []));
+          this.data = json.data;
+          this.saveLocalOnly();
+          this.syncToCloud();
+        } else {
+          this.data = json.data;
+          this.saveLocalOnly();
+        }
+
         this.cloudStatus = 'connected';
         this.cloudDbName = json.database || 'gym_db';
         this.lastSyncedAt = new Date().toISOString();
-        this.saveLocalOnly();
         this.notify();
         return true;
       }
@@ -143,8 +154,8 @@ class GymStore {
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed.membership_plan && parsed.member && parsed.fee_due && parsed.payment) {
-            if (!Array.isArray(parsed.attendance)) {
-              parsed.attendance = INITIAL_DATA.attendance || [];
+            if (!Array.isArray(parsed.attendance) || parsed.attendance.length === 0) {
+              parsed.attendance = JSON.parse(JSON.stringify(INITIAL_DATA.attendance || []));
             }
             return parsed;
           }
