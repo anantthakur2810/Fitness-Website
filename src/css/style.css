@@ -1383,38 +1383,8 @@ dialog.dialog-modal::backdrop {
   font-weight: 700;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 920px) {
-  .home-hero,
-  .video-showcase-grid,
-  .location-grid {
-    grid-template-columns: 1fr;
-  }
-  .hero-title {
-    font-size: 2rem;
-  }
-}
+/* Header & Container default responsive transitions */
 
-@media (max-width: 768px) {
-  .app-header {
-    padding: 0 1rem;
-    height: auto;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-  }
-  .container {
-    padding: 1.5rem 1rem;
-  }
-  .profile-card-grid,
-  .hero-quick-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .home-hero {
-    padding: 1.35rem;
-  }
-}
 
 /* ==========================================================================
    ATTENDANCE & SMART PASS TURNSTILE SYSTEM
@@ -3894,15 +3864,687 @@ select.search-input:focus,
   color: var(--text-main);
 }
 
+/* ==========================================================================
+   COMPREHENSIVE MOBILE RESPONSIVENESS SUITE (PHONES & TABLETS)
+   ========================================================================== */
+
+/* 1. Medium Screens / Tablets (max-width: 920px) */
+@media (max-width: 920px) {
+  .home-hero,
+  .video-showcase-grid,
+  .location-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-title {
+    font-size: 2.15rem;
+  }
+}
+
+/* 2. Standard Mobile Devices & Tablets (max-width: 768px) */
 @media (max-width: 768px) {
+  /* Prevent iOS zoom & horizontal jitter */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+  }
+
+  .container {
+    padding: 1rem 0.85rem;
+  }
+
+  /* Mobile App Header: Top row Brand & Profile; Bottom row Scrollable Tabs */
+  .app-header {
+    height: auto;
+    padding: 0.65rem 1rem 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .brand {
+    order: 1;
+    font-size: 0.95rem;
+    gap: 0.45rem;
+  }
+
+  .brand-branch {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.45rem;
+  }
+
+  .header-actions {
+    order: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .btn-portal-login, .btn-admin-login {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .auth-role-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-top: 0.35rem;
+    padding-bottom: 0.15rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* View Header & Action Buttons */
+  .view-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .view-title {
+    font-size: 1.45rem;
+  }
+
+  .view-subtitle {
+    font-size: 0.82rem;
+  }
+
+  .view-header > div:last-child {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .view-header > div:last-child button,
+  .view-header > div:last-child a {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
+  /* Metric Cards */
+  .metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .metric-card {
+    padding: 0.85rem 1rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+  }
+
+  .metric-val {
+    font-size: 1.45rem;
+  }
+
+  .metric-sub {
+    font-size: 0.7rem;
+  }
+
+  /* Table Toolbars & Search */
+  .table-toolbar {
+    padding: 0.75rem 0.85rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .search-input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .table-toolbar > div {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .table-toolbar select {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .search-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .filters-wrap {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .anim-select-wrap {
+    flex: 1 1 calc(50% - 0.4rem);
+    min-width: 125px;
+  }
+
+  .anim-select-trigger {
+    width: 100%;
+    font-size: 0.78rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  /* Touch-friendly Horizontal Table Scroll */
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table.data-table th, table.data-table td {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  /* Gate Status Bar */
+  .gate-status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+  }
+
+  /* Member Portal on Mobile */
+  .member-header-card {
+    padding: 1.15rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .member-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .member-avatar-lg {
+    width: 48px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+
+  .member-name {
+    font-size: 1.25rem;
+  }
+
+  .member-meta-line {
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.78rem;
+  }
+
+  .member-header-actions {
+    width: 100%;
+  }
+
+  .member-header-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .portal-nav-bar {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.35rem;
+  }
+
+  .portal-nav-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .portal-tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.82rem;
+  }
+
   .member-pass-grid, .plan-details-grid {
     grid-template-columns: 1fr;
   }
-  .member-header-card {
+
+  .member-card-visual {
+    max-width: 100%;
+    width: 100%;
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+  }
+
+  .due-pay-card {
+    padding: 1rem;
+  }
+
+  .due-card-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .rzp-trigger-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  .plan-info-card, .plan-perks-card {
+    padding: 1.15rem 1rem;
+  }
+
+  /* Modals & Dialogs on Mobile */
+  dialog.dialog-modal {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 92vh;
+    border-radius: 12px;
+    margin: auto;
+  }
+
+  .modal-body-content {
+    padding: 1.15rem 1rem;
+  }
+
+  .modal-head {
+    padding: 0.85rem 1rem;
+  }
+
+  .modal-foot {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .modal-foot button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .auth-modal-container {
+    padding: 1.25rem 1rem;
+    gap: 1rem;
+  }
+
+  .auth-title {
+    font-size: 1.25rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .auth-tab-btn {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .receipt-container {
+    padding: 1rem 0.75rem;
+  }
+
+  /* Toast Shelf Mobile */
+  #toast-shelf {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    align-items: center;
+  }
+
+  .minimal-toast {
+    width: 100%;
+    text-align: center;
+    font-size: 0.82rem;
+    padding: 0.65rem 1rem;
   }
 }
+
+/* 3. Standard Smartphone Screens (max-width: 640px) */
+@media (max-width: 640px) {
+  /* Home Page Layout */
+  .home-page {
+    gap: 2.25rem;
+  }
+
+  .home-hero {
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-md);
+    gap: 1.35rem;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+    line-height: 1.15;
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 1.15rem;
+  }
+
+  .hero-portal-bar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .hero-portal-bar button {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .hero-quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .hero-image-frame {
+    aspect-ratio: 16 / 10;
+    max-height: 220px;
+  }
+
+  .facilities-grid,
+  .gallery-grid,
+  .plans-list,
+  .socials-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .facility-card,
+  .gallery-card,
+  .location-info-card,
+  .social-card {
+    padding: 1rem;
+  }
+
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .section-title {
+    font-size: 1.35rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.82rem;
+  }
+
+  .video-viewport {
+    aspect-ratio: 16 / 9;
+  }
+
+  .video-controls-bar {
+    padding: 0.65rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .video-chapters {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .video-chapters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .map-embed-card iframe {
+    height: 240px !important;
+    min-height: 240px !important;
+  }
+
+  /* Razorpay Standard Checkout Phone Adaptations */
+  .rzp-container {
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .rzp-header {
+    padding: 0.85rem 1rem 0.75rem;
+    gap: 0.65rem;
+  }
+
+  .rzp-merchant-logo {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .rzp-merchant-name {
+    font-size: 0.95rem;
+  }
+
+  .rzp-order-label {
+    font-size: 0.72rem;
+  }
+
+  .rzp-amount-val {
+    font-size: 1.35rem;
+  }
+
+  .rzp-view-details-btn {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .rzp-contact-strip {
+    font-size: 0.68rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .rzp-body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .rzp-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.45rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.25rem;
+  }
+
+  .rzp-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rzp-nav-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.45rem 0.65rem;
+    gap: 0.45rem;
+    border-left: 1px solid transparent;
+  }
+
+  .rzp-nav-item.active {
+    border-left-color: #cbd5e1;
+    border-bottom: 2px solid #0744a6;
+  }
+
+  .rzp-nav-icon-wrap {
+    width: 26px;
+    height: 26px;
+  }
+
+  .rzp-nav-title {
+    font-size: 0.78rem;
+  }
+
+  .rzp-nav-sub {
+    display: none;
+  }
+
+  .rzp-content {
+    padding: 1rem 0.75rem;
+  }
+
+  .rzp-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .rzp-bank-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+  }
+
+  .rzp-bank-card {
+    padding: 0.5rem 0.6rem;
+    gap: 0.4rem;
+  }
+
+  .rzp-bank-badge {
+    min-width: 36px;
+    font-size: 0.6rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .rzp-bank-name {
+    font-size: 0.72rem;
+  }
+
+  .rzp-proc-title {
+    font-size: 1.05rem;
+  }
+
+  .rzp-proc-sub {
+    font-size: 0.76rem;
+  }
+
+  .rzp-proc-bar-wrap {
+    width: 180px;
+  }
+
+  .rzp-proc-order-pill {
+    font-size: 0.7rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .rzp-proc-bank-box {
+    font-size: 0.72rem;
+    padding: 0.5rem 0.65rem;
+    max-width: 100%;
+  }
+
+  .rzp-success-title {
+    font-size: 1.25rem;
+  }
+
+  .rzp-success-amt {
+    font-size: 1.45rem;
+  }
+
+  .rzp-receipt-details-card {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.72rem;
+  }
+
+  .rzp-footer {
+    padding: 0.65rem 1rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* 4. Compact Smartphones (max-width: 420px) */
+@media (max-width: 420px) {
+  .metrics-row {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-quick-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .hero-title {
+    font-size: 1.65rem;
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+  }
+
+  .app-header {
+    padding: 0.5rem 0.75rem 0.4rem;
+  }
+
+  .container {
+    padding: 0.85rem 0.65rem;
+  }
+}
+
 
 
 
