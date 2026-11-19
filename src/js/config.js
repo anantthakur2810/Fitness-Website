@@ -26,5 +26,9 @@ export const CONFIG = {
   defaultGraceDays: Number(env.VITE_DEFAULT_GRACE_DAYS ?? 5),
   defaultPenaltyPerDay: Number(env.VITE_DEFAULT_PENALTY_PER_DAY ?? 10),
   defaultMaxPenalty: Number(env.VITE_DEFAULT_MAX_PENALTY ?? 500),
-  storageKey: env.VITE_STORAGE_KEY || 'GYM_DB_STORAGE_V4'
+  storageKey: env.VITE_STORAGE_KEY || 'GYM_DB_STORAGE_V4',
+
+  // Razorpay Payment Gateway Configuration
+  razorpayKeyId: env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag',
+  razorpayMerchantName: env.VITE_RAZORPAY_MERCHANT_NAME || 'Anytime Fitness Sohna'
 };

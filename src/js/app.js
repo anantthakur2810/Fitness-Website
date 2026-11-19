@@ -8,6 +8,7 @@ import { calculateDuePenalty, formatINR, formatDate, getOverviewMetrics, generat
 import { renderHome, cleanupHomeEffects } from './home.js';
 import { renderAttendanceView, openGateCheckInModal } from './attendance.js';
 import { renderDigitalMemberPass } from './qr.js';
+import { openRazorpayCheckout } from './razorpay.js';
 import { CONFIG } from './config.js';
 
 let activeView = 'home';
@@ -265,6 +266,9 @@ function renderDashboard(container) {
                           💬 Remind
                         </a>
                       ` : ''}
+                      <button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #0c2340 0%, #174276 100%); color: #fff; border: 1px solid #2b84ea; font-size: 0.76rem; padding: 0.3rem 0.55rem; display: inline-flex; align-items: center; gap: 0.25rem;" onclick="openRazorpayCheckout(${d.due_id})" title="Instant Razorpay Checkout">
+                        ⚡ Razorpay
+                      </button>
                       <button type="button" class="btn btn-sm btn-accent" onclick="openPayModal(${d.due_id})">
                         Collect Fee
                       </button>
@@ -731,6 +735,9 @@ function renderFeeDues(container) {
                           💬 Remind
                         </a>
                       ` : ''}
+                      <button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #0c2340 0%, #174276 100%); color: #fff; border: 1px solid #2b84ea; font-size: 0.76rem; padding: 0.3rem 0.55rem; display: inline-flex; align-items: center; gap: 0.25rem;" onclick="openRazorpayCheckout(${d.due_id})" title="Instant Razorpay Checkout">
+                        ⚡ Razorpay
+                      </button>
                       <button type="button" class="btn btn-sm btn-accent" onclick="openPayModal(${d.due_id})">
                         Collect
                       </button>
@@ -1109,9 +1116,14 @@ window.openMemberProfileModal = function (memberId) {
                     </td>
                     <td class="tabular-nums font-bold">${formatINR(p.totalPayable)}</td>
                     <td style="text-align: right;">
-                      <button type="button" class="btn btn-sm btn-accent" onclick="closeModal(); openPayModal(${d.due_id});">
-                        Collect
-                      </button>
+                      <div style="display: inline-flex; gap: 0.35rem;">
+                        <button type="button" class="btn btn-sm" style="background: linear-gradient(135deg, #0c2340 0%, #174276 100%); color: #fff; border: 1px solid #2b84ea; font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="closeModal(); openRazorpayCheckout(${d.due_id});" title="Instant Razorpay Checkout">
+                          ⚡ Razorpay
+                        </button>
+                        <button type="button" class="btn btn-sm btn-accent" onclick="closeModal(); openPayModal(${d.due_id});">
+                          Collect
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 `;
@@ -1662,9 +1674,14 @@ window.openPayModal = function (dueId) {
           <input type="text" id="pay-notes" placeholder="e.g. Ref #UPI-98721 or Counter Receipt" />
         </div>
       </div>
-      <div class="modal-foot">
+      <div class="modal-foot" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
         <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-accent">Confirm & Settle</button>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn" style="background: linear-gradient(135deg, #0c2340 0%, #174276 100%); color: #fff; border: 1px solid #2b84ea; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem;" onclick="const pen = document.getElementById('pay-penalty')?.value; openRazorpayCheckout(${due.due_id}, pen);">
+            ⚡ Pay via Razorpay
+          </button>
+          <button type="submit" class="btn btn-accent">Desk Settle</button>
+        </div>
       </div>
     </form>
   `;
