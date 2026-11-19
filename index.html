@@ -15,30 +15,12 @@
       <span class="brand-branch">Sohna</span>
     </a>
 
-    <nav class="nav-links">
-      <button type="button" class="nav-btn active" data-view="home">Home</button>
-      <button type="button" class="nav-btn" data-view="dashboard">Overview</button>
-      <button type="button" class="nav-btn" data-view="members">Members</button>
-      <button type="button" class="nav-btn" data-view="plans">Plans</button>
-      <button type="button" class="nav-btn" data-view="attendance">Attendance</button>
-      <button type="button" class="nav-btn" data-view="dues">Fee Dues</button>
-      <button type="button" class="nav-btn" data-view="payments">Payments</button>
-      <button type="button" class="nav-btn" data-view="settings">Settings</button>
+    <nav class="nav-links" id="nav-links-root">
+      <!-- Injected dynamically based on user/admin role -->
     </nav>
 
-    <div class="header-actions">
-      <!-- Direct Theme Icon Switcher (Click cycles themes) -->
-      <button 
-        type="button" 
-        class="btn-theme-toggle" 
-        id="theme-btn" 
-        title="Switch Theme" 
-        aria-label="Toggle visual theme"
-      >
-        <span id="theme-icon">🌙</span>
-      </button>
-
-      <button type="button" class="btn btn-sm btn-primary" onclick="openAddMemberModal()">+ Member</button>
+    <div class="header-actions" id="header-actions-root">
+      <!-- Injected dynamically based on user/admin role -->
     </div>
   </header>
 

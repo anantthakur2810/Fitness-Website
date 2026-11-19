@@ -9,6 +9,8 @@ import { renderHome, cleanupHomeEffects } from './home.js';
 import { renderAttendanceView, openGateCheckInModal } from './attendance.js';
 import { renderDigitalMemberPass } from './qr.js';
 import { openRazorpayCheckout } from './razorpay.js';
+import { auth, openAuthModal, handleLogout } from './auth.js';
+import { renderMemberPortal } from './memberPortal.js';
 import { CONFIG } from './config.js';
 
 let activeView = 'home';
@@ -34,7 +36,8 @@ let currentThemeIndex = 0;
 
 export function init() {
   const container = document.getElementById('view-root');
-  const navButtons = document.querySelectorAll('.nav-btn');
+  const navRoot = document.getElementById('nav-links-root');
+  const headerActionsRoot = document.getElementById('header-actions-root');
 
   // Apply configurable brand text from env if present
   const brandNameEl = document.querySelector('.brand-name');
@@ -60,18 +63,100 @@ export function init() {
 
   applyTheme(currentThemeIndex, false);
 
-  const themeBtn = document.getElementById('theme-btn');
-  if (themeBtn) {
-    themeBtn.addEventListener('click', () => {
-      currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
-      applyTheme(currentThemeIndex, true);
-    });
+  window.cycleAppTheme = function () {
+    currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+    applyTheme(currentThemeIndex, true);
+    renderHeader();
+  };
+
+  function renderHeader() {
+    const role = auth.getRole();
+    const currentTheme = THEMES[currentThemeIndex];
+
+    const themeButtonHtml = `
+      <button 
+        type="button" 
+        class="btn-theme-toggle" 
+        id="theme-btn" 
+        title="Current Theme: ${currentTheme.name} (Click to switch)" 
+        aria-label="Toggle visual theme"
+        onclick="window.cycleAppTheme()"
+      >
+        <span id="theme-icon">${currentTheme.icon}</span>
+      </button>
+    `;
+
+    if (role === 'admin') {
+      if (navRoot) {
+        navRoot.innerHTML = `
+          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home</button>
+          <button type="button" class="nav-btn ${activeView === 'dashboard' ? 'active' : ''}" onclick="window.navigate('dashboard')">Overview</button>
+          <button type="button" class="nav-btn ${activeView === 'members' ? 'active' : ''}" onclick="window.navigate('members')">Members</button>
+          <button type="button" class="nav-btn ${activeView === 'plans' ? 'active' : ''}" onclick="window.navigate('plans')">Plans</button>
+          <button type="button" class="nav-btn ${activeView === 'attendance' ? 'active' : ''}" onclick="window.navigate('attendance')">Attendance</button>
+          <button type="button" class="nav-btn ${activeView === 'dues' ? 'active' : ''}" onclick="window.navigate('dues')">Fee Dues</button>
+          <button type="button" class="nav-btn ${activeView === 'payments' ? 'active' : ''}" onclick="window.navigate('payments')">Payments</button>
+          <button type="button" class="nav-btn ${activeView === 'settings' ? 'active' : ''}" onclick="window.navigate('settings')">Settings</button>
+        `;
+      }
+      if (headerActionsRoot) {
+        headerActionsRoot.innerHTML = `
+          ${themeButtonHtml}
+          <div class="auth-role-tag admin-tag" title="Signed in as Administrator">
+            <span class="role-tag-dot"></span>
+            <span>🛡️ Admin Console</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" onclick="openAddMemberModal()">+ Member</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Admin Console">🚪 Logout</button>
+        `;
+      }
+    } else if (role === 'member') {
+      const member = auth.getCurrentMember() || auth.getSession().user;
+      const memFirstName = member ? member.full_name.split(' ')[0] : 'Member';
+
+      if (navRoot) {
+        navRoot.innerHTML = `
+          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home / Gym Info</button>
+          <button type="button" class="nav-btn ${activeView === 'member-portal' ? 'active' : ''}" onclick="window.navigate('member-portal')">👤 My Member Portal</button>
+        `;
+      }
+      if (headerActionsRoot) {
+        headerActionsRoot.innerHTML = `
+          ${themeButtonHtml}
+          <button type="button" class="auth-role-tag member-tag" onclick="window.navigate('member-portal')" title="View Your Member Profile">
+            <span class="role-tag-dot" style="background: #22c55e;"></span>
+            <span>👤 ${memFirstName} (#${member ? member.member_id : ''})</span>
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="handleLogout()" title="Sign Out of Member Portal">🚪 Logout</button>
+        `;
+      }
+    } else {
+      // Guest / Visitor Header (Public Only)
+      if (navRoot) {
+        navRoot.innerHTML = `
+          <button type="button" class="nav-btn ${activeView === 'home' ? 'active' : ''}" onclick="window.navigate('home')">Home / Gym Info</button>
+          <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-facilities')">Facilities</button>
+          <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-tour')">Virtual Tour</button>
+          <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-plans')">Membership Plans</button>
+          <button type="button" class="nav-btn" onclick="window.scrollToHomeSection('home-location')">Location & Hours</button>
+        `;
+      }
+      if (headerActionsRoot) {
+        headerActionsRoot.innerHTML = `
+          ${themeButtonHtml}
+          <button type="button" class="btn btn-sm btn-secondary btn-portal-login" onclick="openAuthModal('member')" title="Member Sign In">
+            👤 Member Login
+          </button>
+          <button type="button" class="btn btn-sm btn-primary btn-admin-login" onclick="openAuthModal('admin')" title="Gym Staff / Management">
+            🛡️ Admin Portal
+          </button>
+        `;
+      }
+    }
   }
 
   function render() {
-    navButtons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.view === activeView);
-    });
+    renderHeader();
 
     if (activeView !== 'home') {
       cleanupHomeEffects();
@@ -80,6 +165,9 @@ export function init() {
     switch (activeView) {
       case 'home':
         renderHome(container);
+        break;
+      case 'member-portal':
+        renderMemberPortal(container);
         break;
       case 'dashboard':
         renderDashboard(container);
@@ -108,19 +196,73 @@ export function init() {
   }
 
   window.navigate = function (view) {
-    activeView = view;
+    const role = auth.getRole();
+
+    // Home is public for everyone without login
+    if (view === 'home') {
+      activeView = 'home';
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Member portal requires Member login
+    if (view === 'member-portal') {
+      if (role !== 'member') {
+        showToast('Member login required to access Member Portal.', 'info');
+        openAuthModal('member');
+        return;
+      }
+      activeView = 'member-portal';
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Admin views require Admin login
+    const adminViews = ['dashboard', 'members', 'plans', 'attendance', 'dues', 'payments', 'settings'];
+    if (adminViews.includes(view)) {
+      if (role !== 'admin') {
+        showToast('Admin authentication required for management console.', 'warning');
+        openAuthModal('admin');
+        return;
+      }
+      activeView = view;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    activeView = 'home';
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  navButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.navigate(btn.dataset.view);
-    });
-  });
+  window.scrollToHomeSection = function (sectionId) {
+    if (activeView !== 'home') {
+      activeView = 'home';
+      render();
+    }
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 120);
+  };
 
   store.subscribe(render);
+  auth.subscribe(() => {
+    // If logged out from a protected view, return to home
+    const role = auth.getRole();
+    if (role === 'guest' && activeView !== 'home') {
+      activeView = 'home';
+    } else if (role === 'member' && activeView !== 'home' && activeView !== 'member-portal') {
+      activeView = 'member-portal';
+    }
+    render();
+  });
+
   render();
 }
 

@@ -184,6 +184,20 @@ export function renderHome(container) {
               <div class="hero-stat-lbl">Flexible Plans</div>
             </div>
           </div>
+
+          <div class="hero-portal-bar">
+            <button type="button" class="btn btn-primary" onclick="openAuthModal('member')" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; font-weight: 700;">
+              <span>👤</span>
+              <span>Member Portal Sign In →</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openAuthModal('admin')" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.15rem;">
+              <span>🛡️</span>
+              <span>Admin & Staff Console</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="scrollToHomeSection('home-facilities')" style="padding: 0.75rem 1rem;">
+              <span>Explore Facilities ↓</span>
+            </button>
+          </div>
         </div>
 
         <div class="home-hero-media">
@@ -198,7 +212,7 @@ export function renderHome(container) {
       </section>
 
       <!-- 2. CLUB HIGHLIGHTS & FACILITIES -->
-      <section class="home-section">
+      <section class="home-section" id="home-facilities">
         <div class="section-head">
           <div>
             <h2 class="section-title">Club Facilities &amp; Highlights</h2>
@@ -241,7 +255,7 @@ export function renderHome(container) {
       </section>
 
       <!-- 3. PHOTO GALLERY -->
-      <section class="home-section">
+      <section class="home-section" id="home-gallery">
         <div class="section-head">
           <div>
             <h2 class="section-title">Club Photo Gallery</h2>
@@ -269,7 +283,7 @@ export function renderHome(container) {
       </section>
 
       <!-- 4. VIRTUAL VIDEO TOUR & REELS SHOWCASE -->
-      <section class="home-section">
+      <section class="home-section" id="home-tour">
         <div class="section-head">
           <div>
             <h2 class="section-title">Gym Tour Video &amp; Training Reels</h2>
@@ -341,13 +355,13 @@ export function renderHome(container) {
       </section>
 
       <!-- 5. MEMBERSHIP PLANS PREVIEW -->
-      <section class="home-section">
+      <section class="home-section" id="home-plans">
         <div class="section-head">
           <div>
             <h2 class="section-title">Membership Tiers</h2>
             <p class="section-subtitle">Transparent pricing with flexible durations synced live with club records</p>
           </div>
-          <button type="button" class="btn btn-sm btn-secondary" onclick="window.navigate('plans')">Manage All Plans →</button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="openAuthModal('member')">Join / Member Sign In →</button>
         </div>
 
         <div class="plans-list">
@@ -356,8 +370,8 @@ export function renderHome(container) {
               <div class="plan-item-name">${p.plan_name}</div>
               <div class="plan-item-price">${formatINR(p.monthly_fee)} <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">/ mo</span></div>
               <div class="plan-item-duration">${p.duration_months} Month${p.duration_months > 1 ? 's' : ''} • Total ${formatINR(p.duration_months * p.monthly_fee)}</div>
-              <button type="button" class="btn btn-sm btn-primary" style="margin-top: auto;" onclick="openAddMemberModal()">
-                Enroll in ${p.plan_name}
+              <button type="button" class="btn btn-sm btn-primary" style="margin-top: auto;" onclick="openAuthModal('member')">
+                Join with ${p.plan_name} →
               </button>
             </div>
           `).join('')}
@@ -365,7 +379,7 @@ export function renderHome(container) {
       </section>
 
       <!-- 6. LOCATION MAP & CONTACT -->
-      <section class="home-section">
+      <section class="home-section" id="home-location">
         <div class="section-head">
           <div>
             <h2 class="section-title">Find Us in Sector 34, Sohna</h2>
