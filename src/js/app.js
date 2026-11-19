@@ -636,14 +636,6 @@ function renderMembers(container) {
                     <div style="display: inline-flex; gap: 0.35rem;">
                       <button 
                         type="button" 
-                        class="btn btn-sm btn-primary" 
-                        onclick="openGateCheckInModal(${m.member_id})"
-                        title="Gate Turnstile Check-In"
-                      >
-                        ⚡ Check In
-                      </button>
-                      <button 
-                        type="button" 
                         class="btn btn-sm btn-secondary" 
                         onclick="openMemberProfileModal(${m.member_id})"
                         title="View Full Profile, Digital Pass & Billing"
@@ -1215,11 +1207,8 @@ window.openMemberProfileModal = function (memberId) {
       </div>
 
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button type="button" class="btn btn-sm btn-primary" onclick="closeModal(); openGateCheckInModal(${member.member_id});">
-          ⚡ Instant Turnstile Check-In
-        </button>
-        <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal(); openRenewMemberModal(${member.member_id});">
-          🔄 Renew Next Subscription Cycle
+        <button type="button" class="btn btn-sm btn-primary" onclick="closeModal(); openRenewMemberModal(${member.member_id});">
+          🔄 Renew Subscription
         </button>
         <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal(); openEditMemberModal(${member.member_id});">
           ✏️ Edit Profile

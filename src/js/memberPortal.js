@@ -84,14 +84,6 @@ export function renderMemberPortal(container) {
         </div>
 
         <div class="member-header-actions">
-          <button 
-            type="button" 
-            class="btn btn-primary" 
-            onclick="simulateMemberSelfCheckIn(${member.member_id})"
-            title="Simulate scanning RFID Keyfob / QR pass at the entrance turnstile"
-          >
-            ⚡ Scan Turnstile Entry
-          </button>
           <button type="button" class="btn btn-secondary" onclick="handleLogout()">
             🚪 Sign Out
           </button>
@@ -358,27 +350,18 @@ function renderActiveTabContent(member, plan, dues, pendingDues, payments, atten
     case 'attendance':
       return `
         <div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-            <div>
-              <h3 style="margin: 0;">My Gym Visits & Gate Entries</h3>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0;">
-                Logged automatically by Turnstile Gate A & B sensors whenever you tap your pass.
-              </p>
-            </div>
-            <button 
-              type="button" 
-              class="btn btn-sm btn-primary" 
-              onclick="simulateMemberSelfCheckIn(${member.member_id})"
-            >
-              ⚡ Tap Turnstile
-            </button>
+          <div style="margin-bottom: 1rem;">
+            <h3 style="margin: 0;">My Gym Visits & Gate Entries</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.15rem 0 0;">
+              Turnstile access is recorded automatically whenever you enter using your credentials (RFID keyfob or QR pass).
+            </p>
           </div>
 
           ${attendance.length === 0 ? `
             <div class="empty-state" style="padding: 2.5rem 1rem;">
               <div style="font-size: 2rem;">🚪</div>
               <h4>No attendance logs found</h4>
-              <p style="color: var(--text-muted);">Tap the button above to simulate your first gate check-in.</p>
+              <p style="color: var(--text-muted);">Your entries will appear here automatically when you pass through Turnstile Gate A or B.</p>
             </div>
           ` : `
             <div class="table-wrap">
