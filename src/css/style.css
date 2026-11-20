@@ -2564,6 +2564,62 @@ select.search-input:focus,
   animation: pulseDot 1.5s infinite;
 }
 
+.rzp-real-qr-img {
+  display: block;
+  width: 156px;
+  height: 156px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.rzp-qr-payee-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  width: 100%;
+  max-width: 250px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.rzp-payee-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-weight: 700;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #ddd6fe;
+}
+
+.rzp-payee-text {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rzp-payee-name {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.rzp-payee-vpa {
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+}
+
 .rzp-upi-apps {
   display: flex;
   gap: 0.4rem;

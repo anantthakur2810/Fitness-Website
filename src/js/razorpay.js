@@ -84,8 +84,8 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
   const payerEmail = member ? member.email : 'member@anytimefitness.co.in';
   const payerName = member ? member.full_name : 'Member';
 
-  const upiPayload = `upi://pay?pa=anytimefitness.sohna@icici&pn=AnytimeFitnessSohna&am=${totalAmount.toFixed(2)}&cu=INR&tn=Due-${due.due_id}`;
-  const upiQrSvg = generateQRCodeSVG(upiPayload, { size: 152, color: '#0c2340', bgColor: '#ffffff', quietZone: 1 });
+  const upiPayload = `upi://pay?ver=01&orgid=159002&mode=01&tn=&pa=9650823672@sbi&pn=Siddharth Singh Kathait&mc=0000&qrMedium=02&sign=MEUCIQCHROcWd7+fat5l9gdf2pa68eZhVUwIu3ERRl1zoxaNxQIganSDTIlYHtOtHKKSeLiB6klxWWMV8Lj2Vg6IljT+374=`;
+  const upiQrSvg = generateQRCodeSVG(upiPayload, { size: 160, color: '#0c2340', bgColor: '#ffffff', quietZone: 1 });
 
   const dialog = document.getElementById('modal-generic');
   if (!dialog) return;
@@ -211,10 +211,27 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
             <div class="rzp-qr-wrapper">
               <div class="rzp-qr-box">
                 <div class="rzp-qr-radar-line"></div>
-                ${upiQrSvg}
+                <img 
+                  src="/images/sbi-upi-qr.png" 
+                  alt="SBI UPI QR Code - Siddharth Singh Kathait" 
+                  class="rzp-real-qr-img"
+                  width="160" 
+                  height="160"
+                  onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';"
+                />
+                <div style="display: none;">${upiQrSvg}</div>
                 <div class="rzp-qr-timer-pill">
                   <span class="rzp-radar-dot"></span>
                   <span>Expires in <strong id="rzp-qr-timer" class="tabular-nums">09:59</strong></span>
+                </div>
+              </div>
+
+              <!-- Authentic Payee Details matching SBI QR -->
+              <div class="rzp-qr-payee-info">
+                <div class="rzp-payee-avatar">SK</div>
+                <div class="rzp-payee-text">
+                  <div class="rzp-payee-name">Siddharth Singh Kathait</div>
+                  <div class="rzp-payee-vpa">9650823672@sbi • State Bank of India</div>
                 </div>
               </div>
 
@@ -231,7 +248,7 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
               <button 
                 type="button" 
                 class="rzp-btn-pay rzp-btn-app-pay" 
-                onclick="processRazorpayTransaction('UPI', 'UPI Dynamic QR Scan • Verified by NPCI')"
+                onclick="processRazorpayTransaction('UPI', 'State Bank of India (9650823672@sbi) • NPCI Verified')"
               >
                 <span>⚡ I Have Paid / Verify UPI Status</span>
               </button>
@@ -245,12 +262,13 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
                   type="text" 
                   id="rzp-upi-id" 
                   class="rzp-input" 
-                  placeholder="e.g. mobile@upi" 
-                  value="${payerPhone.replace(/[^0-9]/g, '').slice(-10)}@okhdfcbank"
+                  placeholder="e.g. 9650823672@sbi" 
+                  value="9650823672@sbi"
                 />
               </div>
 
               <div class="rzp-suffix-pills">
+                <button type="button" class="rzp-suffix-btn active" onclick="applyUpiSuffix('@sbi')">@sbi</button>
                 <button type="button" class="rzp-suffix-btn" onclick="applyUpiSuffix('@okhdfcbank')">@okhdfcbank</button>
                 <button type="button" class="rzp-suffix-btn" onclick="applyUpiSuffix('@okicici')">@okicici</button>
                 <button type="button" class="rzp-suffix-btn" onclick="applyUpiSuffix('@paytm')">@paytm</button>
@@ -598,7 +616,7 @@ export function applyUpiSuffix(suffix) {
   const input = document.getElementById('rzp-upi-id');
   if (!input) return;
   const parts = input.value.split('@');
-  const user = parts[0] || '9820112345';
+  const user = parts[0] || '9650823672';
   input.value = `${user}${suffix}`;
   input.focus();
 }
@@ -692,8 +710,8 @@ export function cancelRazorpayPayment() {
  * Triggers for Payment Methods
  */
 export function processUpiIdPayment() {
-  const upiId = document.getElementById('rzp-upi-id')?.value || 'member@upi';
-  processTransaction('UPI', `UPI VPA: ${upiId} (Direct Intent)`);
+  const upiId = document.getElementById('rzp-upi-id')?.value || '9650823672@sbi';
+  processTransaction('UPI', `UPI VPA: ${upiId} • State Bank of India`);
 }
 
 export function processCardPayment() {
@@ -757,10 +775,10 @@ export function processTransaction(mode = 'UPI', bankDetails = '') {
     if (procBar) procBar.style.width = '60%';
 
     if (mode === 'UPI') {
-      if (procTitle) procTitle.textContent = 'Approval Request Sent to UPI App';
-      if (procSub) procSub.textContent = 'Awaiting payment authorization from NPCI & issuing bank';
+      if (procTitle) procTitle.textContent = 'Verifying UPI Payment...';
+      if (procSub) procSub.textContent = 'Connecting to NPCI UPI network & State Bank of India';
       if (bankBoxIcon) bankBoxIcon.textContent = '📱';
-      if (bankBoxText) bankBoxText.textContent = `Approve payment of ${formatINR(totalAmount)} on Google Pay / PhonePe app`;
+      if (bankBoxText) bankBoxText.textContent = `UPI Transaction to 9650823672@sbi (Siddharth Singh Kathait) authorized`;
     } else if (mode === 'Card') {
       if (procTitle) procTitle.textContent = 'Authorizing with Issuing Bank (3D Secure 2.0)';
       if (procSub) procSub.textContent = 'Verifying card credentials with Visa / MasterCard payment network';
@@ -778,7 +796,7 @@ export function processTransaction(mode = 'UPI', bankDetails = '') {
   // --- STAGE 3: SIGNATURE CAPTURE & SETTLEMENT (3.4 to 4.6 seconds) ---
   const t2 = setTimeout(() => {
     if (procBar) procBar.style.width = '92%';
-    if (procTitle) procTitle.textContent = 'Payment Authorized!';
+    if (procTitle) procTitle.textContent = mode === 'UPI' ? 'UPI Payment Authorized by SBI!' : 'Payment Authorized!';
     if (procSub) procSub.textContent = 'Capturing digital signature and confirming settlement with RBI gateway';
     if (bankBoxIcon) bankBoxIcon.textContent = '✅';
     if (bankBoxText) bankBoxText.textContent = `Bank Reference Number (RRN): ${bankRRN}`;
