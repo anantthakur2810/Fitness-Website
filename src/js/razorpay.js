@@ -213,7 +213,7 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
                 <div class="rzp-qr-radar-line"></div>
                 <img 
                   src="/images/sbi-upi-qr.png" 
-                  alt="SBI UPI QR Code - Siddharth Singh Kathait" 
+                  alt="UPI QR Code" 
                   class="rzp-real-qr-img"
                   width="160" 
                   height="160"
@@ -223,15 +223,6 @@ export function openRazorpayCheckout(dueId, customPenalty = null) {
                 <div class="rzp-qr-timer-pill">
                   <span class="rzp-radar-dot"></span>
                   <span>Expires in <strong id="rzp-qr-timer" class="tabular-nums">09:59</strong></span>
-                </div>
-              </div>
-
-              <!-- Authentic Payee Details matching SBI QR -->
-              <div class="rzp-qr-payee-info">
-                <div class="rzp-payee-avatar">SK</div>
-                <div class="rzp-payee-text">
-                  <div class="rzp-payee-name">Siddharth Singh Kathait</div>
-                  <div class="rzp-payee-vpa">9650823672@sbi • State Bank of India</div>
                 </div>
               </div>
 
@@ -778,7 +769,7 @@ export function processTransaction(mode = 'UPI', bankDetails = '') {
       if (procTitle) procTitle.textContent = 'Verifying UPI Payment...';
       if (procSub) procSub.textContent = 'Connecting to NPCI UPI network & State Bank of India';
       if (bankBoxIcon) bankBoxIcon.textContent = '📱';
-      if (bankBoxText) bankBoxText.textContent = `UPI Transaction to 9650823672@sbi (Siddharth Singh Kathait) authorized`;
+      if (bankBoxText) bankBoxText.textContent = `UPI Transaction to 9650823672@sbi authorized by NPCI`;
     } else if (mode === 'Card') {
       if (procTitle) procTitle.textContent = 'Authorizing with Issuing Bank (3D Secure 2.0)';
       if (procSub) procSub.textContent = 'Verifying card credentials with Visa / MasterCard payment network';
